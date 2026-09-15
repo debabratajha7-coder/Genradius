@@ -8,6 +8,7 @@ import { TrustRow } from "@/components/home/TrustRow";
 import { BlogTeaser } from "@/components/home/BlogTeaser";
 import { FeaturedOn } from "@/components/home/FeaturedOn";
 import { RecentlyViewed } from "@/components/home/RecentlyViewed";
+import { Reveal } from "@/components/motion/Reveal";
 import { getCategories, getProducts } from "@/lib/products";
 import { getActiveReels } from "@/lib/reels";
 
@@ -15,10 +16,10 @@ export default async function HomePage() {
   const [categories, bestsellers, centreStage, newArrivals, watch, reels] =
     await Promise.all([
       getCategories(),
-      getProducts({ featured: true, limit: 10 }),
-      getProducts({ collection: "premium", limit: 8 }),
-      getProducts({ collection: "radius-range", limit: 8 }),
-      getProducts({ limit: 8 }),
+      getProducts({ featured: true, limit: 12 }),
+      getProducts({ collection: "premium", limit: 10 }),
+      getProducts({ collection: "radius-range", limit: 10 }),
+      getProducts({ limit: 10 }),
       getActiveReels(12),
     ]);
 
@@ -31,25 +32,39 @@ export default async function HomePage() {
         ctaLabel="See more bestsellers"
         ctaHref="/shop"
       />
-      <WatchAndBuy products={watch} reels={reels} />
+      <Reveal>
+        <WatchAndBuy products={watch} reels={reels} />
+      </Reveal>
       <ProductCarousel
         title="Centre Stage Collection"
         products={centreStage}
         ctaLabel="Explore all products"
         ctaHref="/shop"
       />
-      <TopCategories categories={categories} />
-      <RadiusBand />
+      <Reveal>
+        <TopCategories categories={categories} />
+      </Reveal>
+      <Reveal y={48}>
+        <RadiusBand />
+      </Reveal>
       <ProductCarousel
         title="New Arrivals"
         products={newArrivals}
         ctaLabel="See all new arrivals"
         ctaHref="/shop?collection=radius-range"
       />
-      <CollectionStrip />
-      <TrustRow />
-      <BlogTeaser />
-      <FeaturedOn />
+      <Reveal>
+        <CollectionStrip />
+      </Reveal>
+      <Reveal>
+        <TrustRow />
+      </Reveal>
+      <Reveal>
+        <BlogTeaser />
+      </Reveal>
+      <Reveal>
+        <FeaturedOn />
+      </Reveal>
       <RecentlyViewed />
     </>
   );

@@ -39,17 +39,42 @@ function toProductLean(doc: Record<string, unknown>): ProductLean {
   };
 }
 
+function filterMemoryProducts(opts?: {
+  category?: string;
+  collection?: string;
+  featured?: boolean;
+  limit?: number;
+}): ProductLean[] {
+  let list = memoryProducts();
+  if (opts?.category) {
+    list = list.filter((p) => p.categorySlugs.includes(opts.category!));
+  }
+  if (opts?.collection) {
+    list = list.filter((p) => p.collectionTags.includes(opts.collection!));
+  }
+  if (opts?.featured) {
+    list = list.filter((p) => p.featured);
+  }
+  if (opts?.limit) list = list.slice(0, opts.limit);
+  return list;
+}
+
 export async function getPromos(): Promise<PromoLean[]> {
   if (useMemoryCatalog()) return memoryPromos().filter((p) => p.active);
 
-  await connectDB();
-  const rows = await Promo.find({ active: true }).sort({ order: 1 }).lean();
-  return rows.map((r) => ({
-    _id: String(r._id),
-    text: r.text,
-    active: r.active,
-    order: r.order,
-  }));
+  try {
+    await connectDB();
+    const rows = await Promo.find({ active: true }).sort({ order: 1 }).lean();
+    if (!rows.length) return memoryPromos().filter((p) => p.active);
+    return rows.map((r) => ({
+      _id: String(r._id),
+      text: r.text,
+      active: r.active,
+      order: r.order,
+    }));
+  } catch {
+    return memoryPromos().filter((p) => p.active);
+  }
 }
 
 export async function getCategories(): Promise<CategoryLean[]> {
@@ -57,15 +82,22 @@ export async function getCategories(): Promise<CategoryLean[]> {
     return memoryCategories().sort((a, b) => a.order - b.order);
   }
 
-  await connectDB();
-  const rows = await Category.find().sort({ order: 1 }).lean();
-  return rows.map((r) => ({
-    _id: String(r._id),
-    name: r.name,
-    slug: r.slug,
-    image: r.image,
-    order: r.order,
-  }));
+  try {
+    await connectDB();
+    const rows = await Category.find().sort({ order: 1 }).lean();
+    if (!rows.length) {
+      return memoryCategories().sort((a, b) => a.order - b.order);
+    }
+    return rows.map((r) => ({
+      _id: String(r._id),
+      name: r.name,
+      slug: r.slug,
+      image: r.image,
+      order: r.order,
+    }));
+  } catch {
+    return memoryCategories().sort((a, b) => a.order - b.order);
+  }
 }
 
 export async function getCategoryBySlug(
@@ -81,34 +113,28 @@ export async function getProducts(opts?: {
   featured?: boolean;
   limit?: number;
 }): Promise<ProductLean[]> {
-  if (useMemoryCatalog()) {
-    let list = memoryProducts();
-    if (opts?.category) {
-      list = list.filter((p) => p.categorySlugs.includes(opts.category!));
-    }
-    if (opts?.collection) {
-      list = list.filter((p) => p.collectionTags.includes(opts.collection!));
-    }
-    if (opts?.featured) {
-      list = list.filter((p) => p.featured);
-    }
-    if (opts?.limit) list = list.slice(0, opts.limit);
-    return list;
+  if (useMemoryCatalog()) return filterMemoryProducts(opts);
+
+  try {
+    await connectDB();
+    const filter: Record<string, unknown> = {};
+    if (opts?.category) filter.categorySlugs = opts.category;
+    if (opts?.collection) filter.collectionTags = opts.collection;
+    if (opts?.featured) filter.featured = true;
+
+    let query = Product.find({
+      ...filter,
+      $or: [{ active: true }, { active: { $exists: false } }],
+    }).sort({ featured: -1, createdAt: -1 });
+    if (opts?.limit) query = query.limit(opts.limit);
+    const rows = await query.lean();
+    if (!rows.length) return filterMemoryProducts(opts);
+    return rows.map((r) =>
+      toProductLean(r as unknown as Record<string, unknown>),
+    );
+  } catch {
+    return filterMemoryProducts(opts);
   }
-
-  await connectDB();
-  const filter: Record<string, unknown> = {};
-  if (opts?.category) filter.categorySlugs = opts.category;
-  if (opts?.collection) filter.collectionTags = opts.collection;
-  if (opts?.featured) filter.featured = true;
-
-  let query = Product.find({
-    ...filter,
-    $or: [{ active: true }, { active: { $exists: false } }],
-  }).sort({ featured: -1, createdAt: -1 });
-  if (opts?.limit) query = query.limit(opts.limit);
-  const rows = await query.lean();
-  return rows.map((r) => toProductLean(r as unknown as Record<string, unknown>));
 }
 
 export async function getProductBySlug(
@@ -118,13 +144,19 @@ export async function getProductBySlug(
     return memoryProducts().find((p) => p.slug === slug) ?? null;
   }
 
-  await connectDB();
-  const row = await Product.findOne({
-    slug,
-    $or: [{ active: true }, { active: { $exists: false } }],
-  }).lean();
-  if (!row) return null;
-  return toProductLean(row as unknown as Record<string, unknown>);
+  try {
+    await connectDB();
+    const row = await Product.findOne({
+      slug,
+      $or: [{ active: true }, { active: { $exists: false } }],
+    }).lean();
+    if (!row) {
+      return memoryProducts().find((p) => p.slug === slug) ?? null;
+    }
+    return toProductLean(row as unknown as Record<string, unknown>);
+  } catch {
+    return memoryProducts().find((p) => p.slug === slug) ?? null;
+  }
 }
 
 export { discountPercent, formatINR } from "@/lib/format";

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import type { ProductLean } from "@/types/catalog";
 import { ProductCard } from "@/components/product/ProductCard";
+import { Reveal } from "@/components/motion/Reveal";
 
 export function ProductCarousel({
   title,
@@ -20,7 +21,7 @@ export function ProductCarousel({
 
   const scroll = (dir: -1 | 1) => {
     scroller.current?.scrollBy({
-      left: dir * 300,
+      left: dir * 320,
       behavior: "smooth",
     });
   };
@@ -28,13 +29,15 @@ export function ProductCarousel({
   if (!products.length) return null;
 
   return (
-    <section className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6">
-      <h2 className="section-title mb-8">{title}</h2>
+    <section className="mx-auto max-w-[1400px] px-4 py-14 sm:px-6">
+      <Reveal>
+        <h2 className="section-title mb-10">{title}</h2>
+      </Reveal>
       <div className="relative">
         <button
           type="button"
           onClick={() => scroll(-1)}
-          className="absolute top-1/3 left-0 z-10 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] text-lg shadow-[3px_3px_0_0_var(--ink)] hover:translate-x-[calc(-50%+1px)] hover:translate-y-px hover:shadow-[2px_2px_0_0_var(--ink)] sm:left-2 sm:translate-x-0 sm:hover:translate-x-px"
+          className="absolute top-[38%] left-0 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-white text-lg shadow-[3px_3px_0_0_var(--ink)] transition hover:bg-[var(--sand)] sm:left-2 sm:translate-x-0"
           aria-label="Scroll left"
         >
           ‹
@@ -42,29 +45,31 @@ export function ProductCarousel({
         <button
           type="button"
           onClick={() => scroll(1)}
-          className="absolute top-1/3 right-0 z-10 flex h-9 w-9 translate-x-1/2 items-center justify-center rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] text-lg shadow-[3px_3px_0_0_var(--ink)] hover:translate-x-[calc(50%-1px)] hover:translate-y-px hover:shadow-[2px_2px_0_0_var(--ink)] sm:right-2 sm:translate-x-0 sm:hover:translate-x-px"
+          className="absolute top-[38%] right-0 z-10 flex h-10 w-10 translate-x-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-white text-lg shadow-[3px_3px_0_0_var(--ink)] transition hover:bg-[var(--sand)] sm:right-2 sm:translate-x-0"
           aria-label="Scroll right"
         >
           ›
         </button>
         <div
           ref={scroller}
-          className="flex gap-4 overflow-x-auto px-1 pb-2 scrollbar-none"
+          className="flex gap-5 overflow-x-auto px-1 pb-3 scrollbar-none"
           style={{ scrollbarWidth: "none" }}
         >
           {products.map((p) => (
-            <div key={p._id} className="w-[240px] shrink-0 sm:w-[260px]">
+            <div key={p._id} className="w-[250px] shrink-0 sm:w-[270px]">
               <ProductCard product={p} />
             </div>
           ))}
         </div>
       </div>
       {ctaLabel && ctaHref && (
-        <div className="mt-8 flex justify-center">
-          <Link href={ctaHref} className="btn-accent px-10 py-3.5 text-sm">
-            {ctaLabel}
-          </Link>
-        </div>
+        <Reveal delay={0.1}>
+          <div className="mt-10 flex justify-center">
+            <Link href={ctaHref} className="btn-accent px-11 py-3.5 text-sm">
+              {ctaLabel}
+            </Link>
+          </div>
+        </Reveal>
       )}
     </section>
   );
