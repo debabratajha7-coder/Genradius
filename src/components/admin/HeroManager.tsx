@@ -8,6 +8,69 @@ import type { HeroSlideLean } from "@/lib/hero-defaults";
 const field =
   "w-full rounded-md border-2 border-[var(--ink)] bg-white px-3 py-2 text-sm shadow-[2px_2px_0_0_var(--ink)]";
 
+function PhonePreview({
+  image,
+  eyebrow,
+  title,
+  highlight,
+  ctaLabel,
+}: {
+  image?: string;
+  eyebrow: string;
+  title: string;
+  highlight: string;
+  ctaLabel: string;
+}) {
+  return (
+    <div className="mx-auto w-full max-w-[280px]">
+      <p className="mb-2 text-center text-[10px] font-extrabold tracking-wider text-[var(--moss)] uppercase">
+        Phone preview
+      </p>
+      <div className="overflow-hidden rounded-2xl border-2 border-[var(--ink)] bg-[var(--ink)] shadow-[4px_4px_0_0_var(--ink)]">
+        <div className="relative aspect-[5/6]">
+          {image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={image}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-[var(--surface)] text-[10px] text-[var(--moss)]">
+              Drop an image
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-3">
+            {eyebrow ? (
+              <span className="mb-1.5 inline-block rounded-md bg-[var(--sand)] px-1.5 py-0.5 text-[8px] font-extrabold tracking-wider text-[var(--ink)] uppercase">
+                {eyebrow}
+              </span>
+            ) : null}
+            <p className="font-[family-name:var(--font-display)] text-sm leading-tight font-extrabold text-white uppercase">
+              {title || "Headline"}
+            </p>
+            {highlight ? (
+              <p
+                className="font-[family-name:var(--font-logo)] text-sm leading-tight text-transparent uppercase"
+                style={{
+                  backgroundImage: "linear-gradient(180deg, #be9c7d, #cbcfd0)",
+                  WebkitBackgroundClip: "text",
+                }}
+              >
+                {highlight}
+              </p>
+            ) : null}
+            <span className="mt-2 inline-block rounded-md bg-[var(--sand)] px-2.5 py-1 text-[8px] font-extrabold tracking-wider text-[var(--ink)] uppercase">
+              {ctaLabel || "Shop now"}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function HeroManager({ initial }: { initial: HeroSlideLean[] }) {
   const router = useRouter();
   const [slides, setSlides] = useState(initial);
@@ -16,10 +79,11 @@ export function HeroManager({ initial }: { initial: HeroSlideLean[] }) {
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const [newImage, setNewImage] = useState<string[]>([]);
-  const [newTitle, setNewTitle] = useState("OWN YOUR");
-  const [newHighlight, setNewHighlight] = useState("RADIUS");
-  const [newEyebrow, setNewEyebrow] = useState("DROP");
+  const [newTitle, setNewTitle] = useState("");
+  const [newHighlight, setNewHighlight] = useState("");
+  const [newEyebrow, setNewEyebrow] = useState("");
   const [newHref, setNewHref] = useState("/shop");
+  const [newCtaLabel, setNewCtaLabel] = useState("Shop now");
   const [creating, setCreating] = useState(false);
 
   async function patchSlide(id: string, body: Partial<HeroSlideLean>) {
@@ -60,6 +124,10 @@ export function HeroManager({ initial }: { initial: HeroSlideLean[] }) {
       setError("Drop a background image first");
       return;
     }
+    if (!newTitle.trim()) {
+      setError("Headline is required");
+      return;
+    }
     setCreating(true);
     setError("");
     try {
@@ -68,10 +136,11 @@ export function HeroManager({ initial }: { initial: HeroSlideLean[] }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           image: newImage[0],
-          title: newTitle,
-          highlight: newHighlight,
-          eyebrow: newEyebrow,
-          href: newHref,
+          title: newTitle.trim(),
+          highlight: newHighlight.trim(),
+          eyebrow: newEyebrow.trim(),
+          href: newHref.trim() || "/shop",
+          ctaLabel: newCtaLabel.trim() || "Shop now",
           order: slides.length,
         }),
       });
@@ -81,10 +150,11 @@ export function HeroManager({ initial }: { initial: HeroSlideLean[] }) {
         [...prev, data.slide as HeroSlideLean].sort((a, b) => a.order - b.order),
       );
       setNewImage([]);
-      setNewTitle("OWN YOUR");
-      setNewHighlight("RADIUS");
-      setNewEyebrow("DROP");
+      setNewTitle("");
+      setNewHighlight("");
+      setNewEyebrow("");
       setNewHref("/shop");
+      setNewCtaLabel("Shop now");
       setStatus("Slide added — live on the homepage hero.");
       router.refresh();
     } catch (err) {
@@ -144,60 +214,86 @@ export function HeroManager({ initial }: { initial: HeroSlideLean[] }) {
           Add hero slide
         </h2>
         <p className="text-xs text-[var(--moss)]">
-          Drag &amp; drop a wide background photo — it uploads to Cloudinary,
-          then appears in the top homepage carousel.
+          Full control of the homepage panel — image, top label, headline,
+          accent line, and button. Crop before upload.
         </p>
-        <ImageUploader
-          label="Background image"
-          folder="genradius/hero"
-          images={newImage}
-          onChange={setNewImage}
-          max={1}
-          replaceOnUpload
-        />
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block space-y-1 text-xs font-extrabold uppercase">
-            Eyebrow
-            <input
-              className={field}
-              value={newEyebrow}
-              onChange={(e) => setNewEyebrow(e.target.value)}
+
+        <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+          <div className="space-y-4">
+            <ImageUploader
+              label="Background image"
+              folder="genradius/hero"
+              images={newImage}
+              onChange={setNewImage}
+              max={1}
+              replaceOnUpload
+              cropAspect={16 / 9}
             />
-          </label>
-          <label className="block space-y-1 text-xs font-extrabold uppercase">
-            Link (CTA)
-            <input
-              className={field}
-              value={newHref}
-              onChange={(e) => setNewHref(e.target.value)}
-              placeholder="/shop"
-            />
-          </label>
-          <label className="block space-y-1 text-xs font-extrabold uppercase">
-            Title
-            <input
-              required
-              className={field}
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-            />
-          </label>
-          <label className="block space-y-1 text-xs font-extrabold uppercase">
-            Highlight
-            <input
-              className={field}
-              value={newHighlight}
-              onChange={(e) => setNewHighlight(e.target.value)}
-            />
-          </label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="block space-y-1 text-xs font-extrabold uppercase">
+                Top label
+                <input
+                  className={field}
+                  value={newEyebrow}
+                  onChange={(e) => setNewEyebrow(e.target.value)}
+                  placeholder="e.g. JUST DROPPED"
+                />
+              </label>
+              <label className="block space-y-1 text-xs font-extrabold uppercase">
+                Button text
+                <input
+                  className={field}
+                  value={newCtaLabel}
+                  onChange={(e) => setNewCtaLabel(e.target.value)}
+                  placeholder="Shop now"
+                />
+              </label>
+              <label className="block space-y-1 text-xs font-extrabold uppercase">
+                Headline
+                <input
+                  required
+                  className={field}
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="Main line on the panel"
+                />
+              </label>
+              <label className="block space-y-1 text-xs font-extrabold uppercase">
+                Accent line
+                <input
+                  className={field}
+                  value={newHighlight}
+                  onChange={(e) => setNewHighlight(e.target.value)}
+                  placeholder="Gradient accent under headline"
+                />
+              </label>
+              <label className="block space-y-1 text-xs font-extrabold uppercase sm:col-span-2">
+                Button link
+                <input
+                  className={field}
+                  value={newHref}
+                  onChange={(e) => setNewHref(e.target.value)}
+                  placeholder="/shop"
+                />
+              </label>
+            </div>
+            <button
+              type="submit"
+              disabled={creating}
+              className="btn-accent px-6 py-3 text-sm"
+            >
+              {creating ? "Saving…" : "Add slide"}
+            </button>
+          </div>
+
+          <PhonePreview
+            image={newImage[0]}
+            eyebrow={newEyebrow}
+            title={newTitle}
+            highlight={newHighlight}
+            ctaLabel={newCtaLabel}
+          />
         </div>
-        <button
-          type="submit"
-          disabled={creating}
-          className="btn-accent px-6 py-3 text-sm"
-        >
-          {creating ? "Saving…" : "Add slide"}
-        </button>
       </form>
 
       <ul className="space-y-5">
@@ -210,6 +306,7 @@ export function HeroManager({ initial }: { initial: HeroSlideLean[] }) {
               <p className="text-xs font-extrabold tracking-wider uppercase text-[var(--moss)]">
                 Slide {i + 1}
                 {busyId === slide._id ? " · saving…" : ""}
+                {!slide.active ? " · hidden" : ""}
               </p>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -247,28 +344,16 @@ export function HeroManager({ initial }: { initial: HeroSlideLean[] }) {
               </div>
             </div>
 
-            <div className="mt-4 grid gap-5 lg:grid-cols-[220px_1fr]">
-              <div>
-                <div className="relative aspect-[16/10] overflow-hidden rounded-md border-2 border-[var(--ink)] bg-[var(--surface)]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={slide.image}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div className="mt-3">
-                  <ImageUploader
-                    label="Replace background (drag & drop)"
-                    folder="genradius/hero"
-                    images={[slide.image]}
-                    onChange={(urls) => void onImageReplace(slide._id, urls)}
-                    max={1}
-                    replaceOnUpload
-                  />
-                </div>
-              </div>
-
+            <div className="mt-4 grid gap-5 lg:grid-cols-1">
+              <ImageUploader
+                label="Replace background (drag & drop)"
+                folder="genradius/hero"
+                images={[slide.image]}
+                onChange={(urls) => void onImageReplace(slide._id, urls)}
+                max={1}
+                replaceOnUpload
+                cropAspect={16 / 9}
+              />
               <SlideFields
                 slide={slide}
                 disabled={busyId === slide._id}
@@ -281,8 +366,7 @@ export function HeroManager({ initial }: { initial: HeroSlideLean[] }) {
 
       {slides.length === 0 && (
         <p className="text-sm text-[var(--moss)]">
-          No slides yet — add one above. Defaults appear on the store until you
-          save.
+          No slides yet — add one above. You control every line on the panel.
         </p>
       )}
     </div>
@@ -305,59 +389,66 @@ function SlideFields({
   const [ctaLabel, setCtaLabel] = useState(slide.ctaLabel);
 
   return (
-    <div className="space-y-3">
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="block space-y-1 text-xs font-extrabold uppercase">
-          Eyebrow
-          <input
-            className={field}
-            value={eyebrow}
-            onChange={(e) => setEyebrow(e.target.value)}
-          />
-        </label>
-        <label className="block space-y-1 text-xs font-extrabold uppercase">
-          CTA label
-          <input
-            className={field}
-            value={ctaLabel}
-            onChange={(e) => setCtaLabel(e.target.value)}
-          />
-        </label>
-        <label className="block space-y-1 text-xs font-extrabold uppercase">
-          Title line
-          <input
-            className={field}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </label>
-        <label className="block space-y-1 text-xs font-extrabold uppercase">
-          Highlight line
-          <input
-            className={field}
-            value={highlight}
-            onChange={(e) => setHighlight(e.target.value)}
-          />
-        </label>
-        <label className="block space-y-1 text-xs font-extrabold uppercase sm:col-span-2">
-          Button link
-          <input
-            className={field}
-            value={href}
-            onChange={(e) => setHref(e.target.value)}
-          />
-        </label>
+    <div className="grid gap-5 lg:grid-cols-[1fr_240px]">
+      <div className="space-y-3">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block space-y-1 text-xs font-extrabold uppercase">
+            Top label
+            <input
+              className={field}
+              value={eyebrow}
+              onChange={(e) => setEyebrow(e.target.value)}
+            />
+          </label>
+          <label className="block space-y-1 text-xs font-extrabold uppercase">
+            Button text
+            <input
+              className={field}
+              value={ctaLabel}
+              onChange={(e) => setCtaLabel(e.target.value)}
+            />
+          </label>
+          <label className="block space-y-1 text-xs font-extrabold uppercase">
+            Headline
+            <input
+              className={field}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </label>
+          <label className="block space-y-1 text-xs font-extrabold uppercase">
+            Accent line
+            <input
+              className={field}
+              value={highlight}
+              onChange={(e) => setHighlight(e.target.value)}
+            />
+          </label>
+          <label className="block space-y-1 text-xs font-extrabold uppercase sm:col-span-2">
+            Button link
+            <input
+              className={field}
+              value={href}
+              onChange={(e) => setHref(e.target.value)}
+            />
+          </label>
+        </div>
+        <button
+          type="button"
+          disabled={disabled}
+          className="btn-accent px-5 py-2.5 text-xs"
+          onClick={() => onSave({ eyebrow, title, highlight, href, ctaLabel })}
+        >
+          Save text
+        </button>
       </div>
-      <button
-        type="button"
-        disabled={disabled}
-        className="btn-accent px-5 py-2.5 text-xs"
-        onClick={() =>
-          onSave({ eyebrow, title, highlight, href, ctaLabel })
-        }
-      >
-        Save text
-      </button>
+      <PhonePreview
+        image={slide.image}
+        eyebrow={eyebrow}
+        title={title}
+        highlight={highlight}
+        ctaLabel={ctaLabel}
+      />
     </div>
   );
 }

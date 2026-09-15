@@ -54,13 +54,13 @@ export function ProductCard({ product }: { product: ProductLean }) {
             </span>
           ))}
         </div>
-        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-full bg-black/65 px-2 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
+        <div className="absolute bottom-2.5 left-2.5 hidden items-center gap-1 rounded-full bg-black/65 px-2 py-1 text-[11px] font-semibold text-white backdrop-blur-sm lg:flex">
           <span className="text-[var(--sand)]">★</span>
           <span>{product.rating.toFixed(1)}</span>
           <span className="opacity-50">|</span>
           <span className="opacity-80">{product.reviewCount}</span>
         </div>
-        <div className="absolute right-2.5 bottom-2.5 flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 text-[11px] text-white backdrop-blur-sm">
+        <div className="absolute right-2.5 bottom-2.5 hidden items-center gap-1 rounded-full bg-black/50 px-2 py-1 text-[11px] text-white backdrop-blur-sm lg:flex">
           <span className="flex -space-x-1">
             {["#2a291e", "#be9c7d", "#878c64"]
               .slice(0, Math.min(3, colors))

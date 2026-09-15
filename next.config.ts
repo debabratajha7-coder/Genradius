@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
   turbopack: {
     root,
   },
+  experimental: {
+    // Admin image uploads (hero / products) via FormData
+    proxyClientMaxBodySize: "20mb",
+    serverActions: {
+      bodySizeLimit: "20mb",
+    },
+  },
   images: {
     remotePatterns: [
       {

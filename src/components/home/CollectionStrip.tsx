@@ -38,12 +38,12 @@ export function CollectionStrip() {
           <Link
             key={d.name}
             href={d.href}
-            className="group relative overflow-hidden rounded-md border-2 border-[var(--ink)] shadow-[2px_2px_0_0_var(--ink)]"
+            className="group relative overflow-hidden rounded-2xl"
           >
             <div
               className={`flex aspect-[5/4] items-end bg-gradient-to-br ${d.bg} p-2.5`}
             >
-              <span className="rounded-sm bg-white/95 px-2 py-1 text-[10px] font-extrabold tracking-wide uppercase">
+              <span className="rounded-md bg-white/95 px-2 py-1 text-[10px] font-extrabold tracking-wide uppercase shadow-sm">
                 {d.label}
               </span>
             </div>

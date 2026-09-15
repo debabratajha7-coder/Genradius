@@ -4,13 +4,43 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
-const LINKS = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/hero", label: "Hero" },
-  { href: "/admin/products", label: "Products" },
-  { href: "/admin/reels", label: "Reels" },
-  { href: "/admin/categories", label: "Categories" },
+const GROUPS: {
+  title: string;
+  links: { href: string; label: string }[];
+}[] = [
+  {
+    title: "Overview",
+    links: [{ href: "/admin", label: "Dashboard" }],
+  },
+  {
+    title: "Storefront",
+    links: [
+      { href: "/admin/hero", label: "Hero" },
+      { href: "/admin/promos", label: "Promos" },
+    ],
+  },
+  {
+    title: "Catalog",
+    links: [
+      { href: "/admin/products", label: "Products" },
+      { href: "/admin/categories", label: "Categories" },
+      { href: "/admin/reels", label: "Reels" },
+    ],
+  },
+  {
+    title: "Customers",
+    links: [{ href: "/admin/customers", label: "Customers" }],
+  },
+  {
+    title: "More",
+    links: [{ href: "/admin/orders", label: "Orders" }],
+  },
 ];
+
+function linkActive(pathname: string, href: string) {
+  if (href === "/admin") return pathname === "/admin";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -31,29 +61,15 @@ export function AdminShell({ children }: { children: ReactNode }) {
               Genradius Admin
             </p>
             <p className="text-xs font-medium text-[var(--moss)]">
-              Catalog · media · reels
+              Storefront · catalog · customers
             </p>
           </div>
-          <nav className="flex flex-wrap gap-2">
-            {LINKS.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={`rounded-md border-2 border-[var(--ink)] px-3 py-1.5 text-xs font-extrabold uppercase shadow-[2px_2px_0_0_var(--ink)] ${
-                  pathname === l.href ||
-                  (l.href !== "/admin" && pathname.startsWith(l.href))
-                    ? "bg-[var(--olive)]"
-                    : "bg-[var(--background)] hover:bg-[var(--accent-soft)]"
-                }`}
-              >
-                {l.label}
-              </Link>
-            ))}
+          <div className="flex flex-wrap gap-2">
             <Link
               href="/"
               className="rounded-md border-2 border-[var(--ink)] bg-[var(--silver)] px-3 py-1.5 text-xs font-extrabold uppercase shadow-[2px_2px_0_0_var(--ink)]"
             >
-              Store
+              View store
             </Link>
             <button
               type="button"
@@ -62,10 +78,37 @@ export function AdminShell({ children }: { children: ReactNode }) {
             >
               Logout
             </button>
-          </nav>
+          </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-6 lg:grid-cols-[200px_1fr]">
+        <nav className="space-y-5 lg:sticky lg:top-4 lg:self-start">
+          {GROUPS.map((group) => (
+            <div key={group.title}>
+              <p className="mb-2 text-[10px] font-extrabold tracking-[0.16em] text-[var(--moss)] uppercase">
+                {group.title}
+              </p>
+              <div className="flex flex-wrap gap-2 lg:flex-col">
+                {group.links.map((l) => (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    className={`rounded-md border-2 border-[var(--ink)] px-3 py-1.5 text-xs font-extrabold uppercase shadow-[2px_2px_0_0_var(--ink)] ${
+                      linkActive(pathname, l.href)
+                        ? "bg-[var(--olive)]"
+                        : "bg-white hover:bg-[var(--accent-soft)]"
+                    }`}
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+        </nav>
+        <main className="min-w-0">{children}</main>
+      </div>
     </div>
   );
 }

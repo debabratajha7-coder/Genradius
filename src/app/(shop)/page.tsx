@@ -35,6 +35,9 @@ export default async function HomePage() {
   return (
     <>
       <HeroCarousel slides={heroSlides} />
+      <Reveal>
+        <TopCategories categories={categories} />
+      </Reveal>
       <ProductCarousel
         title="Our Bestsellers"
         products={bestsellers}
@@ -50,12 +53,6 @@ export default async function HomePage() {
         ctaLabel="Explore all products"
         ctaHref="/shop"
       />
-      <Reveal>
-        <TopCategories categories={categories} />
-      </Reveal>
-      <Reveal y={48}>
-        <RadiusBand />
-      </Reveal>
       <ProductCarousel
         title="New Arrivals"
         products={newArrivals}
@@ -64,6 +61,9 @@ export default async function HomePage() {
       />
       <Reveal>
         <CollectionStrip />
+      </Reveal>
+      <Reveal y={48}>
+        <RadiusBand />
       </Reveal>
       <Reveal>
         <TrustRow />

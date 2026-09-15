@@ -81,7 +81,7 @@ export function CategoriesManager({ initial }: { initial: Cat[] }) {
             onChange={(e) => setOrder(e.target.value)}
           />
         </div>
-        <ImageUploader images={images} onChange={setImages} />
+        <ImageUploader images={images} onChange={setImages} cropAspect={1} />
         {error && <p className="text-sm text-red-700">{error}</p>}
         <button type="submit" className="btn-accent px-6 py-3 text-sm">
           Save category

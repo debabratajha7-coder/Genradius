@@ -132,6 +132,7 @@ export function ProductForm({
       <ImageUploader
         images={form.images}
         onChange={(images) => set("images", images)}
+        cropAspect={3 / 4}
       />
 
       <div className="grid gap-4 md:grid-cols-2">

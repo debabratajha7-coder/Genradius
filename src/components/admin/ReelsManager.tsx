@@ -98,7 +98,7 @@ export function ReelsManager({ initial }: { initial: ReelRow[] }) {
             placeholder="orbit-beige-oversized-graphic-tee"
           />
         </label>
-        <ImageUploader images={thumbs} onChange={setThumbs} />
+        <ImageUploader images={thumbs} onChange={setThumbs} cropAspect={4 / 5} />
         {error && <p className="text-sm font-semibold text-red-700">{error}</p>}
         <button type="submit" disabled={busy} className="btn-accent px-6 py-3 text-sm">
           {busy ? "Saving…" : "Save reel"}

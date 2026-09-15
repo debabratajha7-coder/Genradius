@@ -11,13 +11,17 @@ export function ProductCarousel({
   products,
   ctaLabel,
   ctaHref,
+  phoneLimit = 6,
 }: {
   title: string;
   products: ProductLean[];
   ctaLabel?: string;
   ctaHref?: string;
+  /** How many products to show in the phone 2-col grid */
+  phoneLimit?: number;
 }) {
   const scroller = useRef<HTMLDivElement>(null);
+  const phoneProducts = products.slice(0, phoneLimit);
 
   const scroll = (dir: -1 | 1) => {
     scroller.current?.scrollBy({
@@ -29,15 +33,34 @@ export function ProductCarousel({
   if (!products.length) return null;
 
   return (
-    <section className="mx-auto max-w-[1400px] px-3 py-8 sm:px-6 sm:py-14">
+    <section className="mx-auto max-w-[1400px] px-3 py-6 sm:px-6 sm:py-14">
       <Reveal>
-        <h2 className="section-title mb-6 sm:mb-10">{title}</h2>
+        <div className="mb-4 flex items-end justify-between gap-3 sm:mb-10">
+          <h2 className="section-title mb-0">{title}</h2>
+          {ctaLabel && ctaHref ? (
+            <Link
+              href={ctaHref}
+              className="shrink-0 text-[10px] font-extrabold tracking-wider text-[var(--moss)] uppercase underline-offset-2 hover:underline lg:hidden"
+            >
+              View all
+            </Link>
+          ) : null}
+        </div>
       </Reveal>
-      <div className="relative">
+
+      {/* Phone: 2-col commerce grid */}
+      <div className="app-product-grid grid grid-cols-2 gap-2.5 lg:hidden">
+        {phoneProducts.map((p) => (
+          <ProductCard key={p._id} product={p} />
+        ))}
+      </div>
+
+      {/* Desktop / tablet: horizontal carousel */}
+      <div className="relative hidden lg:block">
         <button
           type="button"
           onClick={() => scroll(-1)}
-          className="absolute top-[38%] left-0 z-10 hidden h-10 w-10 -translate-x-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-white text-lg shadow-[3px_3px_0_0_var(--ink)] transition hover:bg-[var(--sand)] sm:left-2 sm:flex sm:translate-x-0"
+          className="absolute top-[38%] left-0 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-white text-lg shadow-[3px_3px_0_0_var(--ink)] transition hover:bg-[var(--sand)] sm:left-2 sm:translate-x-0"
           aria-label="Scroll left"
         >
           ‹
@@ -45,32 +68,30 @@ export function ProductCarousel({
         <button
           type="button"
           onClick={() => scroll(1)}
-          className="absolute top-[38%] right-0 z-10 hidden h-10 w-10 translate-x-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-white text-lg shadow-[3px_3px_0_0_var(--ink)] transition hover:bg-[var(--sand)] sm:right-2 sm:flex sm:translate-x-0"
+          className="absolute top-[38%] right-0 z-10 flex h-10 w-10 translate-x-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-white text-lg shadow-[3px_3px_0_0_var(--ink)] transition hover:bg-[var(--sand)] sm:right-2 sm:translate-x-0"
           aria-label="Scroll right"
         >
           ›
         </button>
         <div
           ref={scroller}
-          className="snap-x-mandatory flex gap-3 overflow-x-auto px-1 pb-3 scrollbar-none sm:gap-5"
+          className="snap-x-mandatory flex gap-5 overflow-x-auto px-1 pb-3 scrollbar-none"
           style={{ scrollbarWidth: "none" }}
         >
           {products.map((p) => (
-            <div
-              key={p._id}
-              className="snap-start w-[min(58vw,200px)] shrink-0 sm:w-[270px]"
-            >
+            <div key={p._id} className="snap-start w-[270px] shrink-0">
               <ProductCard product={p} />
             </div>
           ))}
         </div>
       </div>
+
       {ctaLabel && ctaHref && (
         <Reveal delay={0.1}>
-          <div className="mt-8 flex justify-center sm:mt-10">
+          <div className="mt-6 hidden justify-center sm:mt-10 lg:flex">
             <Link
               href={ctaHref}
-              className="btn-accent w-full max-w-xs px-8 py-3.5 text-center text-sm sm:w-auto sm:max-w-none sm:px-11"
+              className="btn-accent px-11 py-3.5 text-center text-sm"
             >
               {ctaLabel}
             </Link>
