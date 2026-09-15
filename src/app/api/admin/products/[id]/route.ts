@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { connectDB, useMemoryCatalog } from "@/lib/db";
 import Product from "@/models/Product";
@@ -96,6 +97,9 @@ export async function PUT(req: Request, ctx: Ctx) {
     }).lean();
 
     if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    revalidatePath("/");
+    revalidatePath("/shop");
+    revalidatePath(`/product/${row.slug}`);
     return NextResponse.json(row);
   } catch (e) {
     const message = e instanceof Error ? e.message : "Update failed";
@@ -111,6 +115,10 @@ export async function DELETE(_req: Request, ctx: Ctx) {
 
   const { id } = await ctx.params;
   await connectDB();
+  const existing = await Product.findById(id).lean();
   await Product.findByIdAndDelete(id);
+  revalidatePath("/");
+  revalidatePath("/shop");
+  if (existing?.slug) revalidatePath(`/product/${existing.slug}`);
   return NextResponse.json({ ok: true });
 }

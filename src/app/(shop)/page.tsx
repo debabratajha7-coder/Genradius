@@ -26,7 +26,7 @@ export default async function HomePage() {
     getProducts({ featured: true, limit: 12 }),
     getProducts({ collection: "premium", limit: 10 }),
     getProducts({ collection: "radius-range", limit: 10 }),
-    getProducts({ limit: 10 }),
+    getProducts({ collection: "watch-buy", limit: 10 }),
     getActiveReels(12),
     getHeroSlides(),
   ]);

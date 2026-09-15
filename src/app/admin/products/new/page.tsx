@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { AdminGate } from "@/components/admin/AdminGate";
 import { ProductForm } from "@/components/admin/ProductForm";
+import { getCategories } from "@/lib/products";
 
-export default function NewProductPage() {
+export default async function NewProductPage() {
+  const categories = await getCategories();
+
   return (
     <AdminGate>
       <Link
@@ -15,7 +18,17 @@ export default function NewProductPage() {
         New product
       </h1>
       <div className="mt-6 rounded-md border-2 border-[var(--ink)] bg-white p-5 shadow-[4px_4px_0_0_var(--ink)]">
-        <ProductForm />
+        {categories.length === 0 ? (
+          <p className="text-sm text-[var(--moss)]">
+            Add a category first under{" "}
+            <Link href="/admin/categories" className="font-bold underline">
+              Top Categories
+            </Link>
+            .
+          </p>
+        ) : (
+          <ProductForm categories={categories} />
+        )}
       </div>
     </AdminGate>
   );

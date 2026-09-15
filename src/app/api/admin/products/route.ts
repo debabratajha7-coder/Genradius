@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { connectDB, useMemoryCatalog } from "@/lib/db";
 import Product from "@/models/Product";
@@ -94,6 +95,9 @@ export async function POST(req: Request) {
       bestPrice: body.bestPrice != null ? Number(body.bestPrice) : null,
     });
 
+    revalidatePath("/");
+    revalidatePath("/shop");
+    revalidatePath(`/product/${doc.slug}`);
     return NextResponse.json(doc, { status: 201 });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Create failed";

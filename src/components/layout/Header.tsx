@@ -40,10 +40,30 @@ const NAV = [
 ];
 
 const ACCOUNT_LINKS = [
-  { label: "Your profile", href: "/account", hint: "Name, email, phone" },
-  { label: "Your orders", href: "/account#orders", hint: "Track & reorder" },
-  { label: "Addresses", href: "/account#addresses", hint: "Delivery spots" },
-  { label: "Wishlist", href: "/account#wishlist", hint: "Saved drops" },
+  {
+    label: "Profile",
+    href: "/account",
+    hint: "Your details",
+    icon: "◎",
+  },
+  {
+    label: "Orders",
+    href: "/account#orders",
+    hint: "Track & reorder",
+    icon: "▦",
+  },
+  {
+    label: "Addresses",
+    href: "/account#addresses",
+    hint: "Delivery spots",
+    icon: "⌖",
+  },
+  {
+    label: "Wishlist",
+    href: "/account#wishlist",
+    hint: "Saved drops",
+    icon: "♡",
+  },
 ] as const;
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -234,135 +254,145 @@ export function Header() {
       </div>
 
       <AnimatePresence>
-        {mobileOpen && (
+        {mobileOpen ? (
           <motion.div
-            className="fixed inset-0 z-[70] flex flex-col bg-[var(--background)] lg:hidden"
-            initial={reduce ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.28, ease }}
+            key="mobile-drawer"
+            className="fixed inset-0 z-[70] lg:hidden"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 1 }}
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
           >
-            <div className="flex items-center justify-between border-b-2 border-[var(--ink)] px-4 py-3.5 pt-[max(0.85rem,env(safe-area-inset-top))]">
-              <p className="font-[family-name:var(--font-logo)] text-sm uppercase">
-                Menu
-              </p>
-              <button
-                type="button"
-                className="rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] px-3 py-1.5 text-[10px] font-extrabold tracking-widest uppercase shadow-[2px_2px_0_0_var(--ink)]"
-                onClick={closeMenu}
-              >
-                Close
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto overscroll-contain">
-              {/* Account essentials */}
-              <div className="border-b-2 border-[var(--ink)] bg-[var(--sand)]/35 px-4 py-4">
-                <p className="text-[10px] font-extrabold tracking-[0.16em] text-[var(--moss)] uppercase">
-                  Your account
+            <motion.button
+              type="button"
+              aria-label="Close menu"
+              className="absolute inset-0 bg-[var(--ink)]/45"
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease }}
+              onClick={closeMenu}
+            />
+            <motion.aside
+              className="absolute top-0 left-0 flex h-[100dvh] w-[min(86vw,320px)] flex-col border-r-2 border-[var(--ink)] bg-[var(--background)] shadow-[8px_0_30px_rgba(42,41,30,0.2)]"
+              initial={reduce ? false : { x: "-105%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-105%" }}
+              transition={{ duration: 0.28, ease }}
+            >
+              <div className="flex shrink-0 items-center justify-between border-b-2 border-[var(--ink)] px-4 py-3.5 pt-[max(0.85rem,env(safe-area-inset-top))]">
+                <p className="font-[family-name:var(--font-logo)] text-sm uppercase">
+                  Menu
                 </p>
-                <p className="mt-1 text-sm font-semibold">
-                  {user
-                    ? user.name || user.phone || user.email || "Signed in"
-                    : "Guest"}
-                </p>
-                <div className="mt-3 grid gap-1">
-                  {ACCOUNT_LINKS.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={user ? link.href : "/login"}
-                      onClick={closeMenu}
-                      className="flex items-center justify-between rounded-md px-2 py-2.5 active:bg-white/70"
-                    >
-                      <span>
-                        <span className="block text-[13px] font-extrabold tracking-wide uppercase">
-                          {link.label}
-                        </span>
-                        <span className="text-[11px] text-[var(--moss)]">
-                          {link.hint}
-                        </span>
-                      </span>
-                      <span className="text-[var(--moss)]" aria-hidden>
-                        ›
-                      </span>
-                    </Link>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeMenu();
-                      openCart();
-                    }}
-                    className="flex items-center justify-between rounded-md px-2 py-2.5 text-left active:bg-white/70"
-                  >
-                    <span>
-                      <span className="block text-[13px] font-extrabold tracking-wide uppercase">
-                        Your bag
-                      </span>
-                      <span className="text-[11px] text-[var(--moss)]">
-                        {count > 0 ? `${count} items` : "Empty"}
-                      </span>
-                    </span>
-                    <span className="text-[var(--moss)]" aria-hidden>
-                      ›
-                    </span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className="rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] px-3 py-1.5 text-[10px] font-extrabold tracking-widest uppercase shadow-[2px_2px_0_0_var(--ink)]"
+                  onClick={closeMenu}
+                >
+                  Close
+                </button>
               </div>
 
-              {/* Shop */}
-              <nav className="px-2 py-2">
-                <p className="px-3 pt-3 pb-1 text-[10px] font-extrabold tracking-[0.16em] text-[var(--moss)] uppercase">
-                  Shop
-                </p>
-                {NAV.map((item, i) => (
-                  <motion.div
-                    key={item.label}
-                    initial={reduce ? false : { opacity: 0, x: -12 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      delay: 0.04 + i * 0.03,
-                      duration: 0.28,
-                      ease,
-                    }}
-                    className="border-b border-[var(--border)]/70"
-                  >
-                    <div className="flex items-center">
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                <div className="border-b-2 border-[var(--ink)] bg-[var(--sand)] px-3 py-4">
+                  <p className="px-1 text-xs text-[var(--moss)]">
+                    {user
+                      ? `Hi, ${user.name || user.phone || user.email || "there"}`
+                      : "Sign in to sync orders & wishlist"}
+                  </p>
+
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    {ACCOUNT_LINKS.map((link) => (
                       <Link
-                        href={item.href}
-                        className="flex-1 px-3 py-3.5 text-[13px] font-extrabold tracking-[0.12em] uppercase"
+                        key={link.href}
+                        href={user ? link.href : "/login"}
                         onClick={closeMenu}
+                        className="rounded-xl border-2 border-[var(--ink)] bg-white px-3 py-3 shadow-[2px_2px_0_0_var(--ink)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
                       >
-                        {item.label}
+                        <span className="text-base" aria-hidden>
+                          {link.icon}
+                        </span>
+                        <span className="mt-1 block text-[12px] font-extrabold tracking-wide uppercase">
+                          {link.label}
+                        </span>
+                        <span className="block text-[10px] text-[var(--moss)]">
+                          {link.hint}
+                        </span>
                       </Link>
-                      {item.children.length > 0 && (
-                        <button
-                          type="button"
-                          className="min-h-11 min-w-11 px-3 text-lg"
-                          aria-label={`Expand ${item.label}`}
-                          onClick={() =>
-                            setExpanded((v) =>
-                              v === item.label ? null : item.label,
-                            )
-                          }
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeMenu();
+                        openCart();
+                      }}
+                      className="rounded-xl border-2 border-[var(--ink)] bg-white px-3 py-3 text-left shadow-[2px_2px_0_0_var(--ink)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                    >
+                      <span className="text-base" aria-hidden>
+                        ▤
+                      </span>
+                      <span className="mt-1 block text-[12px] font-extrabold tracking-wide uppercase">
+                        Bag
+                      </span>
+                      <span className="block text-[10px] text-[var(--moss)]">
+                        {count > 0 ? `${count} items` : "Empty"}
+                      </span>
+                    </button>
+                    <Link
+                      href="/shop"
+                      onClick={closeMenu}
+                      className="rounded-xl border-2 border-[var(--ink)] bg-white px-3 py-3 shadow-[2px_2px_0_0_var(--ink)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                    >
+                      <span className="text-base" aria-hidden>
+                        ▦
+                      </span>
+                      <span className="mt-1 block text-[12px] font-extrabold tracking-wide uppercase">
+                        Shop all
+                      </span>
+                      <span className="block text-[10px] text-[var(--moss)]">
+                        Full catalog
+                      </span>
+                    </Link>
+                  </div>
+                </div>
+
+                <nav className="px-2 py-2">
+                  <p className="px-3 pt-3 pb-1 text-[10px] font-extrabold tracking-[0.16em] text-[var(--moss)] uppercase">
+                    Categories
+                  </p>
+                  {NAV.map((item) => (
+                    <div
+                      key={item.label}
+                      className="border-b border-[var(--border)]/70"
+                    >
+                      <div className="flex items-center">
+                        <Link
+                          href={item.href}
+                          className="flex-1 px-3 py-3.5 text-[13px] font-extrabold tracking-[0.12em] uppercase"
+                          onClick={closeMenu}
                         >
-                          {expanded === item.label ? "−" : "+"}
-                        </button>
-                      )}
-                    </div>
-                    <AnimatePresence initial={false}>
+                          {item.label}
+                        </Link>
+                        {item.children.length > 0 && (
+                          <button
+                            type="button"
+                            className="min-h-11 min-w-11 px-3 text-lg"
+                            aria-label={`Expand ${item.label}`}
+                            onClick={() =>
+                              setExpanded((v) =>
+                                v === item.label ? null : item.label,
+                              )
+                            }
+                          >
+                            {expanded === item.label ? "−" : "+"}
+                          </button>
+                        )}
+                      </div>
                       {item.children.length > 0 &&
                         expanded === item.label && (
-                          <motion.ul
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.28, ease }}
-                            className="overflow-hidden bg-[var(--accent-soft)]/50"
-                          >
+                          <ul className="bg-[var(--accent-soft)]/50">
                             {item.children.map((c) => (
                               <li key={c.href}>
                                 <Link
@@ -374,57 +404,57 @@ export function Header() {
                                 </Link>
                               </li>
                             ))}
-                          </motion.ul>
+                          </ul>
                         )}
-                    </AnimatePresence>
-                  </motion.div>
-                ))}
+                    </div>
+                  ))}
 
-                <Link
-                  href="/account#help"
-                  onClick={closeMenu}
-                  className="mt-2 block px-3 py-3.5 text-[13px] font-extrabold tracking-[0.12em] uppercase"
-                >
-                  Help &amp; support
-                </Link>
-              </nav>
-            </div>
+                  <Link
+                    href="/account#help"
+                    onClick={closeMenu}
+                    className="mt-2 block px-3 py-3.5 text-[13px] font-extrabold tracking-[0.12em] uppercase"
+                  >
+                    Help &amp; support
+                  </Link>
+                </nav>
+              </div>
 
-            <div className="grid grid-cols-2 gap-2 border-t-2 border-[var(--ink)] px-4 py-3 pb-[max(0.85rem,env(safe-area-inset-bottom))]">
-              {user ? (
-                <button
-                  type="button"
-                  className="rounded-md border-2 border-[var(--ink)] bg-white py-3.5 text-center text-xs font-extrabold tracking-wider uppercase shadow-[2px_2px_0_0_var(--ink)]"
-                  onClick={() => {
-                    closeMenu();
-                    void logout();
-                  }}
-                >
-                  Log out
-                </button>
-              ) : (
+              <div className="grid shrink-0 grid-cols-2 gap-2 border-t-2 border-[var(--ink)] px-3 py-3 pb-[max(0.85rem,env(safe-area-inset-bottom))]">
+                {user ? (
+                  <button
+                    type="button"
+                    className="rounded-md border-2 border-[var(--ink)] bg-white py-3 text-center text-[10px] font-extrabold tracking-wider uppercase shadow-[2px_2px_0_0_var(--ink)]"
+                    onClick={() => {
+                      closeMenu();
+                      void logout();
+                    }}
+                  >
+                    Log out
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="btn-accent py-3 text-center text-[10px]"
+                    onClick={closeMenu}
+                  >
+                    Log in
+                  </Link>
+                )}
                 <Link
-                  href="/login"
-                  className="btn-accent py-3.5 text-center text-xs"
+                  href="/shop"
+                  className={`py-3 text-center text-[10px] font-extrabold tracking-wider uppercase ${
+                    user
+                      ? "btn-accent"
+                      : "rounded-md border-2 border-[var(--ink)] bg-white shadow-[2px_2px_0_0_var(--ink)]"
+                  }`}
                   onClick={closeMenu}
                 >
-                  Log in
+                  Shop all
                 </Link>
-              )}
-              <Link
-                href="/shop"
-                className={`py-3.5 text-center text-xs font-extrabold tracking-wider uppercase ${
-                  user
-                    ? "btn-accent"
-                    : "rounded-md border-2 border-[var(--ink)] bg-white shadow-[2px_2px_0_0_var(--ink)]"
-                }`}
-                onClick={closeMenu}
-              >
-                Shop all
-              </Link>
-            </div>
+              </div>
+            </motion.aside>
           </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
     </header>
   );

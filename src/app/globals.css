@@ -290,6 +290,11 @@ body::before {
     min-height: 48px;
   }
 
+  .hero-cta {
+    min-height: 0;
+    box-shadow: 2px 2px 0 0 var(--ink);
+  }
+
   .btn-accent:hover {
     transform: none;
     box-shadow: 4px 4px 0 0 var(--ink);

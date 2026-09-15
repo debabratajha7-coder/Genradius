@@ -128,12 +128,12 @@ export async function getProducts(opts?: {
     }).sort({ featured: -1, createdAt: -1 });
     if (opts?.limit) query = query.limit(opts.limit);
     const rows = await query.lean();
-    if (!rows.length) return filterMemoryProducts(opts);
     return rows.map((r) =>
       toProductLean(r as unknown as Record<string, unknown>),
     );
   } catch {
-    return filterMemoryProducts(opts);
+    if (useMemoryCatalog()) return filterMemoryProducts(opts);
+    return [];
   }
 }
 
@@ -150,12 +150,13 @@ export async function getProductBySlug(
       slug,
       $or: [{ active: true }, { active: { $exists: false } }],
     }).lean();
-    if (!row) {
-      return memoryProducts().find((p) => p.slug === slug) ?? null;
-    }
+    if (!row) return null;
     return toProductLean(row as unknown as Record<string, unknown>);
   } catch {
-    return memoryProducts().find((p) => p.slug === slug) ?? null;
+    if (useMemoryCatalog()) {
+      return memoryProducts().find((p) => p.slug === slug) ?? null;
+    }
+    return null;
   }
 }
 

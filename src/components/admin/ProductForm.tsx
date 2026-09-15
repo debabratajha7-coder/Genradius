@@ -3,6 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { ImageUploader } from "./ImageUploader";
+import {
+  HOMEPAGE_PLACEMENTS,
+  applyPlacements,
+  placementsFromProduct,
+  type PlacementId,
+} from "@/lib/storefront-placements";
 
 export type ProductFormValues = {
   title: string;
@@ -12,11 +18,12 @@ export type ProductFormValues = {
   price: string;
   compareAtPrice: string;
   badges: string;
-  categorySlugs: string;
-  collectionTags: string;
+  categorySlug: string;
+  extraCollectionTags: string;
   sizes: string;
   featured: boolean;
   active: boolean;
+  placements: PlacementId[];
 };
 
 const EMPTY: ProductFormValues = {
@@ -27,22 +34,70 @@ const EMPTY: ProductFormValues = {
   price: "",
   compareAtPrice: "",
   badges: "",
-  categorySlugs: "oversized-tees",
-  collectionTags: "",
+  categorySlug: "",
+  extraCollectionTags: "",
   sizes: "S,M,L,XL,XXL",
   featured: false,
   active: true,
+  placements: [],
 };
+
+export function productToFormValues(
+  p: {
+    title: string;
+    slug: string;
+    description: string;
+    images: string[];
+    price: number;
+    compareAtPrice: number;
+    badges?: string[];
+    categorySlugs?: string[];
+    collectionTags?: string[];
+    sizes?: string[];
+    featured?: boolean;
+    active?: boolean;
+  },
+  categories: { slug: string }[],
+): ProductFormValues {
+  const placementIds = placementsFromProduct(p);
+  const placementTagSet = new Set(
+    HOMEPAGE_PLACEMENTS.map((x) => x.collectionTag).filter(Boolean),
+  );
+  const extra = (p.collectionTags ?? []).filter((t) => !placementTagSet.has(t));
+
+  return {
+    title: p.title,
+    slug: p.slug,
+    description: p.description,
+    images: p.images ?? [],
+    price: String(p.price),
+    compareAtPrice: String(p.compareAtPrice),
+    badges: (p.badges ?? []).join(", "),
+    categorySlug:
+      p.categorySlugs?.[0] ?? categories[0]?.slug ?? "",
+    extraCollectionTags: extra.join(", "),
+    sizes: (p.sizes ?? []).join(", "),
+    featured: Boolean(p.featured),
+    active: p.active !== false,
+    placements: placementIds,
+  };
+}
 
 export function ProductForm({
   initial,
   productId,
+  categories,
 }: {
   initial?: Partial<ProductFormValues>;
   productId?: string;
+  categories: { _id: string; name: string; slug: string }[];
 }) {
   const router = useRouter();
-  const [form, setForm] = useState<ProductFormValues>({ ...EMPTY, ...initial });
+  const [form, setForm] = useState<ProductFormValues>({
+    ...EMPTY,
+    categorySlug: categories[0]?.slug ?? "",
+    ...initial,
+  });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -53,11 +108,33 @@ export function ProductForm({
     setForm((f) => ({ ...f, [key]: value }));
   }
 
+  function togglePlacement(id: PlacementId) {
+    setForm((f) => ({
+      ...f,
+      placements: f.placements.includes(id)
+        ? f.placements.filter((x) => x !== id)
+        : [...f.placements, id],
+    }));
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!form.categorySlug) {
+      setError("Pick a product category");
+      return;
+    }
     setBusy(true);
     setError("");
     try {
+      const extraTags = form.extraCollectionTags
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const { featured, collectionTags } = applyPlacements(
+        form.placements,
+        extraTags,
+      );
+
       const payload = {
         title: form.title,
         slug: form.slug,
@@ -66,10 +143,10 @@ export function ProductForm({
         price: Number(form.price),
         compareAtPrice: Number(form.compareAtPrice || form.price),
         badges: form.badges,
-        categorySlugs: form.categorySlugs,
-        collectionTags: form.collectionTags,
+        categorySlugs: [form.categorySlug],
+        collectionTags,
         sizes: form.sizes,
-        featured: form.featured,
+        featured,
         active: form.active,
       };
 
@@ -117,6 +194,32 @@ export function ProductForm({
           />
         </label>
       </div>
+
+      <label className="block space-y-1 text-xs font-extrabold uppercase">
+        Category
+        <select
+          required
+          className={field}
+          value={form.categorySlug}
+          onChange={(e) => set("categorySlug", e.target.value)}
+        >
+          <option value="" disabled>
+            Select type…
+          </option>
+          {categories.map((c) => (
+            <option key={c._id} value={c.slug}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+        <span className="text-[11px] font-normal normal-case text-[var(--moss)]">
+          Same list as Top Categories — add more under{" "}
+          <a href="/admin/categories" className="underline">
+            Top Categories
+          </a>
+          .
+        </span>
+      </label>
 
       <label className="block space-y-1 text-xs font-extrabold uppercase">
         Description
@@ -177,45 +280,53 @@ export function ProductForm({
         </label>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <fieldset className="space-y-3 rounded-md border-2 border-[var(--ink)] bg-[var(--accent-soft)]/30 p-4 shadow-[2px_2px_0_0_var(--ink)]">
+        <legend className="px-1 text-xs font-extrabold tracking-wider uppercase">
+          Show on storefront
+        </legend>
+        <p className="text-[11px] text-[var(--moss)]">
+          Check where this product appears on the homepage and shop filters.
+        </p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {HOMEPAGE_PLACEMENTS.map((p) => (
+            <label
+              key={p.id}
+              className="flex cursor-pointer gap-3 rounded-md border-2 border-[var(--ink)] bg-white px-3 py-2.5 shadow-[2px_2px_0_0_var(--ink)]"
+            >
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={form.placements.includes(p.id)}
+                onChange={() => togglePlacement(p.id)}
+              />
+              <span>
+                <span className="block text-xs font-extrabold uppercase">
+                  {p.label}
+                </span>
+                <span className="text-[10px] text-[var(--moss)]">{p.hint}</span>
+              </span>
+            </label>
+          ))}
+        </div>
         <label className="block space-y-1 text-xs font-extrabold uppercase">
-          Categories (slugs)
+          Extra shop collections (optional)
           <input
             className={field}
-            value={form.categorySlugs}
-            onChange={(e) => set("categorySlugs", e.target.value)}
-            placeholder="oversized-tees,sale"
+            value={form.extraCollectionTags}
+            onChange={(e) => set("extraCollectionTags", e.target.value)}
+            placeholder="orbit, sale"
           />
         </label>
-        <label className="block space-y-1 text-xs font-extrabold uppercase">
-          Collections (tags)
-          <input
-            className={field}
-            value={form.collectionTags}
-            onChange={(e) => set("collectionTags", e.target.value)}
-            placeholder="bestsellers,radius-range"
-          />
-        </label>
-      </div>
+      </fieldset>
 
-      <div className="flex flex-wrap gap-6">
-        <label className="flex items-center gap-2 text-sm font-bold">
-          <input
-            type="checkbox"
-            checked={form.featured}
-            onChange={(e) => set("featured", e.target.checked)}
-          />
-          Featured / bestseller
-        </label>
-        <label className="flex items-center gap-2 text-sm font-bold">
-          <input
-            type="checkbox"
-            checked={form.active}
-            onChange={(e) => set("active", e.target.checked)}
-          />
-          Active on storefront
-        </label>
-      </div>
+      <label className="flex items-center gap-2 text-sm font-bold">
+        <input
+          type="checkbox"
+          checked={form.active}
+          onChange={(e) => set("active", e.target.checked)}
+        />
+        Active on storefront (shop &amp; product pages)
+      </label>
 
       {error && <p className="text-sm font-semibold text-red-700">{error}</p>}
 
