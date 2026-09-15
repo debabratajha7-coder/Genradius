@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Genradius
 
-## Getting Started
+Men's streetwear storefront — Veirdo-inspired layout and energy, original **Genradius** brand.
 
-First, run the development server:
+## Stack
+
+- Next.js (App Router) + TypeScript + Tailwind
+- MongoDB + Mongoose (optional for local demo)
+- Client cart via `localStorage`
+
+## Quick start
 
 ```bash
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+By default `.env.local` sets `USE_MEMORY_CATALOG=true`, so the seeded catalog in `src/data/catalog.ts` loads without MongoDB.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Admin + media
 
-## Learn More
+1. Create a MongoDB Atlas cluster and set `MONGODB_URI`.
+2. Set `USE_MEMORY_CATALOG=false`, `ADMIN_PASSWORD`, `ADMIN_SECRET`.
+3. Create a Cloudinary account and set `CLOUDINARY_*` vars.
+4. `npm run seed` then open `/admin/login`.
 
-To learn more about Next.js, take a look at the following resources:
+Admin can: add/edit/delete products, upload images (or paste URLs), paste Instagram reel links for Watch & Buy, manage categories.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Dev server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run seed` | Wipe & seed Mongo collections |
+| `npm run lint` | ESLint |
 
-## Deploy on Vercel
+## Routes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `/` — home (ticker, hero, categories, carousels)
+- `/shop` — all products (`?collection=radius-range` supported)
+- `/shop/[category]` — category PLP
+- `/product/[slug]` — PDP + add to cart
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## GitHub
+
+Create an empty repo, then:
+
+```bash
+git remote add origin git@github.com:YOUR_USER/genradius.git
+git add .
+git commit -m "Initial Genradius storefront MVP"
+git push -u origin main
+```
+
+See [AGENTS.md](./AGENTS.md) for architecture notes aimed at future Cursor sessions.

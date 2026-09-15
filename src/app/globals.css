@@ -1,26 +1,179 @@
 @import "tailwindcss";
 
+/* Palette: https://coolors.co/be9c7d-cbcfd0-878c64-88986b-535539-443f20-2a291e */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --sand: #be9c7d;
+  --silver: #cbcfd0;
+  --olive: #878c64;
+  --sage: #88986b;
+  --moss: #535539;
+  --earth: #443f20;
+  --ink: #2a291e;
+
+  --background: #f4f3ef;
+  --foreground: #2a291e;
+  --surface: #cbcfd0;
+  --accent: #878c64;
+  --accent-soft: #e8dccf;
+  --accent-grad: linear-gradient(90deg, #88986b 0%, #be9c7d 100%);
+  --ticker: #535539;
+  --muted: #535539;
+  --border: #b8bcbd;
+  --highlight: #be9c7d;
+  --shadow-card: 0 4px 24px rgba(42, 41, 30, 0.08);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+  --font-logo: var(--font-logo);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+@keyframes ticker-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-ticker {
+  animation: ticker-in 0.4s ease-out;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sand);
+  color: var(--ink);
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 2.5px solid var(--ink);
+  border-radius: 4px;
+  box-shadow: 4px 4px 0 0 var(--ink);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.btn-accent:hover {
+  background: var(--sage);
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 0 var(--ink);
+}
+
+.btn-accent:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 0 var(--ink);
+}
+
+.btn-accent-olive {
+  background: var(--olive);
+}
+
+.btn-accent-olive:hover {
+  background: var(--sage);
+}
+
+.btn-accent-silver {
+  background: var(--silver);
+}
+
+.btn-accent-silver:hover {
+  background: var(--sand);
+}
+
+.btn-ghost-brutal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background);
+  color: var(--ink);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  box-shadow: 3px 3px 0 0 var(--ink);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.btn-ghost-brutal:hover {
+  background: var(--accent-soft);
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 0 var(--ink);
+}
+
+.section-title {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Layered Genradius wordmark */
+.brand-logo {
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+  z-index: 0;
+  font-family: var(--font-logo), var(--font-display), sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.brand-logo::before,
+.brand-logo::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+.brand-logo::before {
+  color: var(--sand);
+  transform: translate(-3px, 3px);
+  z-index: -2;
+}
+
+.brand-logo::after {
+  color: var(--olive);
+  transform: translate(-1.5px, 1.5px);
+  z-index: -1;
+}
+
+.brand-logo-lg {
+  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+}
+
+.brand-logo-xl {
+  font-size: clamp(2rem, 5vw, 3.5rem);
 }
