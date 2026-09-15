@@ -7,7 +7,6 @@ import { CollectionStrip } from "@/components/home/CollectionStrip";
 import { TrustRow } from "@/components/home/TrustRow";
 import { BlogTeaser } from "@/components/home/BlogTeaser";
 import { FeaturedOn } from "@/components/home/FeaturedOn";
-import { RecentlyViewed } from "@/components/home/RecentlyViewed";
 import { Reveal } from "@/components/motion/Reveal";
 import { getCategories, getProducts } from "@/lib/products";
 import { getActiveReels } from "@/lib/reels";
@@ -74,7 +73,6 @@ export default async function HomePage() {
       <Reveal>
         <FeaturedOn />
       </Reveal>
-      <RecentlyViewed />
     </>
   );
 }

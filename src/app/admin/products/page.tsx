@@ -39,6 +39,10 @@ export default async function AdminProductsPage() {
           New product
         </Link>
       </div>
+      <p className="mt-2 text-sm text-[var(--moss)]">
+        Bestsellers on the homepage = products marked <strong>Featured</strong>.
+        Edit any product to toggle Featured and upload photos.
+      </p>
 
       <div className="mt-6 overflow-x-auto rounded-md border-2 border-[var(--ink)] bg-white shadow-[4px_4px_0_0_var(--ink)]">
         <table className="min-w-full text-left text-sm">

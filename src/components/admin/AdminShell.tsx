@@ -23,7 +23,7 @@ const GROUPS: {
     title: "Catalog",
     links: [
       { href: "/admin/products", label: "Products" },
-      { href: "/admin/categories", label: "Categories" },
+      { href: "/admin/categories", label: "Top Categories" },
       { href: "/admin/reels", label: "Reels" },
     ],
   },

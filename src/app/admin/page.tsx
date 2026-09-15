@@ -49,11 +49,7 @@ export default async function AdminDashboard() {
       title: "Catalog",
       cards: [
         { label: "Products", value: counts.products, href: "/admin/products" },
-        {
-          label: "Categories",
-          value: counts.categories,
-          href: "/admin/categories",
-        },
+        { label: "Top Categories", value: counts.categories, href: "/admin/categories" },
         { label: "Reels", value: counts.reels, href: "/admin/reels" },
       ],
     },
@@ -108,6 +104,9 @@ export default async function AdminDashboard() {
       <div className="mt-8 flex flex-wrap gap-3">
         <Link href="/admin/hero" className="btn-accent px-6 py-3 text-sm">
           Edit hero panel
+        </Link>
+        <Link href="/admin/categories" className="btn-accent px-6 py-3 text-sm">
+          Edit category logos
         </Link>
         <Link href="/admin/products/new" className="btn-accent px-6 py-3 text-sm">
           Add product

@@ -310,14 +310,17 @@ body::before {
   }
 
   .section-title {
-    font-size: clamp(1.15rem, 5vw, 1.55rem);
-    letter-spacing: 0.06em;
-    margin-bottom: 1rem;
+    font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+    text-align: left;
   }
 
   .section-title::after {
-    margin-top: 0.55rem;
-    width: 36px;
+    margin-top: 0.4rem;
+    margin-left: 0;
+    margin-right: auto;
+    width: 28px;
   }
 
   .brand-logo-lg {
