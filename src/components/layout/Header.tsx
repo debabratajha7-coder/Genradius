@@ -47,6 +47,7 @@ export function Header() {
   const router = useRouter();
   const reduce = useReducedMotion();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -64,44 +65,75 @@ export function Header() {
     e.preventDefault();
     const q = query.trim();
     setMobileOpen(false);
+    setSearchOpen(false);
     router.push(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--background)]/85 shadow-[0_8px_30px_rgba(42,41,30,0.04)] backdrop-blur-xl">
-      <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-2 px-3 sm:h-16 sm:gap-3 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--background)]/92 shadow-[0_8px_30px_rgba(42,41,30,0.04)] backdrop-blur-xl pt-[env(safe-area-inset-top)]">
+      {/* Mobile app bar */}
+      <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-2 px-3 md:hidden">
         <button
           type="button"
-          className="relative z-50 flex h-11 w-11 items-center justify-center rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] shadow-[2px_2px_0_0_var(--ink)] lg:hidden"
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-expanded={mobileOpen}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[var(--ink)] bg-[var(--sand)] shadow-[2px_2px_0_0_var(--ink)]"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open menu"
         >
-          <span className="sr-only">Menu</span>
-          <span className="relative block h-3.5 w-5">
-            <motion.span
-              className="absolute left-0 block h-0.5 w-5 bg-[var(--ink)]"
-              animate={
-                mobileOpen ? { top: 6, rotate: 45 } : { top: 0, rotate: 0 }
-              }
-              transition={{ duration: 0.28, ease }}
-            />
-            <motion.span
-              className="absolute top-[6px] left-0 block h-0.5 w-5 bg-[var(--ink)]"
-              animate={mobileOpen ? { opacity: 0 } : { opacity: 1 }}
-              transition={{ duration: 0.2 }}
-            />
-            <motion.span
-              className="absolute left-0 block h-0.5 w-5 bg-[var(--ink)]"
-              animate={
-                mobileOpen ? { top: 6, rotate: -45 } : { top: 12, rotate: 0 }
-              }
-              transition={{ duration: 0.28, ease }}
-            />
+          <span className="relative block h-3 w-4">
+            <span className="absolute top-0 left-0 block h-0.5 w-4 bg-[var(--ink)]" />
+            <span className="absolute top-[5px] left-0 block h-0.5 w-4 bg-[var(--ink)]" />
+            <span className="absolute top-[10px] left-0 block h-0.5 w-3 bg-[var(--ink)]" />
           </span>
         </button>
 
-        <div className="min-w-0 flex-1 lg:flex-none">
+        <div className="flex min-w-0 flex-1 justify-center">
+          <BrandLogo />
+        </div>
+
+        <button
+          type="button"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[var(--ink)] bg-white shadow-[2px_2px_0_0_var(--ink)]"
+          onClick={() => setSearchOpen((v) => !v)}
+          aria-label="Search"
+          aria-expanded={searchOpen}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="11" cy="11" r="6.5" />
+            <path d="M16 16l4 4" />
+          </svg>
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {searchOpen && (
+          <motion.form
+            key="msearch"
+            onSubmit={onSearch}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.28, ease }}
+            className="overflow-hidden border-t border-[var(--border)] px-3 pb-3 md:hidden"
+          >
+            <div className="mt-3 flex items-center rounded-xl border-2 border-[var(--ink)] bg-white px-3 py-2.5 shadow-[2px_2px_0_0_var(--ink)]">
+              <span className="mr-2 text-[var(--moss)]" aria-hidden>
+                ⌕
+              </span>
+              <input
+                autoFocus
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search tees, cargos…"
+                className="w-full bg-transparent text-base outline-none"
+              />
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
+
+      {/* Desktop bar */}
+      <div className="mx-auto hidden h-16 max-w-[1400px] items-center gap-3 px-6 md:flex">
+        <div className="min-w-0">
           <BrandLogo />
         </div>
 
@@ -161,7 +193,7 @@ export function Header() {
           />
         </form>
 
-        <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-3 lg:ml-0">
+        <div className="ml-auto flex shrink-0 items-center gap-3 lg:ml-0">
           <Link
             href={user ? "/account" : "/login"}
             className="flex h-11 w-11 items-center justify-center text-[var(--ink)]"
@@ -195,14 +227,14 @@ export function Header() {
         {mobileOpen && (
           <>
             <motion.div
-              className="fixed inset-0 z-40 bg-[var(--ink)]/45 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-[var(--ink)]/45 backdrop-blur-sm md:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
             />
             <motion.aside
-              className="fixed top-0 left-0 z-50 flex h-[100dvh] w-[min(100%,22rem)] flex-col border-r-2 border-[var(--ink)] bg-[var(--background)] shadow-[8px_0_0_0_var(--ink)] lg:hidden"
+              className="fixed top-0 left-0 z-50 flex h-[100dvh] w-[min(100%,22rem)] flex-col border-r-2 border-[var(--ink)] bg-[var(--background)] shadow-[8px_0_0_0_var(--ink)] md:hidden"
               initial={reduce ? false : { x: "-105%" }}
               animate={{ x: 0 }}
               exit={{ x: "-105%" }}
@@ -210,7 +242,7 @@ export function Header() {
             >
               <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))]">
                 <p className="font-[family-name:var(--font-logo)] text-sm uppercase">
-                  Menu
+                  Browse
                 </p>
                 <button
                   type="button"
@@ -220,20 +252,6 @@ export function Header() {
                   Close
                 </button>
               </div>
-
-              <form onSubmit={onSearch} className="border-b border-[var(--border)] px-4 py-3">
-                <div className="flex items-center rounded-md border-2 border-[var(--ink)] px-3 py-2.5 shadow-[2px_2px_0_0_var(--ink)]">
-                  <span className="mr-2" aria-hidden>
-                    ⌕
-                  </span>
-                  <input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search"
-                    className="w-full bg-transparent text-base outline-none"
-                  />
-                </div>
-              </form>
 
               <nav className="flex-1 overflow-y-auto px-2 py-3">
                 {NAV.map((item, i) => (
@@ -294,7 +312,7 @@ export function Header() {
                 ))}
               </nav>
 
-              <div className="space-y-2 border-t border-[var(--border)] px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+              <div className="space-y-2 border-t border-[var(--border)] px-4 py-4 pb-[max(1rem,calc(env(safe-area-inset-bottom)+var(--app-tabbar-h)))]">
                 <Link
                   href={user ? "/account" : "/login"}
                   className="btn-accent flex w-full py-3.5 text-sm"
@@ -302,16 +320,6 @@ export function Header() {
                 >
                   {user ? "My account" : "Log in"}
                 </Link>
-                <button
-                  type="button"
-                  className="w-full rounded-md border-2 border-[var(--ink)] bg-white py-3 text-xs font-extrabold tracking-wider uppercase shadow-[2px_2px_0_0_var(--ink)]"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    openCart();
-                  }}
-                >
-                  Open bag ({count})
-                </button>
               </div>
             </motion.aside>
           </>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Outfit, Syne, Unbounded } from "next/font/google";
 import "./globals.css";
 
@@ -27,6 +27,22 @@ export const metadata: Metadata = {
   },
   description:
     "Men's streetwear that refuses to blend in. Oversized tees, polos, cargos — Genradius.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Genradius",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f7f5f0",
 };
 
 export default function RootLayout({

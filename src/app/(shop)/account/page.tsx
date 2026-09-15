@@ -132,7 +132,7 @@ export default function AccountPage() {
     "flex flex-col gap-1 rounded-md border-2 border-[var(--ink)] bg-[var(--background)] p-4 text-left shadow-[3px_3px_0_0_var(--ink)] transition hover:bg-[var(--accent-soft)] active:translate-x-px active:translate-y-px active:shadow-[2px_2px_0_0_var(--ink)]";
 
   return (
-    <FadeIn className="mx-auto max-w-2xl px-4 py-8 sm:py-14">
+    <FadeIn className="mx-auto max-w-2xl px-3 py-5 sm:px-4 sm:py-14">
       {/* Profile */}
       <div className="rounded-md border-2 border-[var(--ink)] bg-white p-6 shadow-[6px_6px_0_0_var(--ink)] sm:p-8">
         <p className="text-[11px] font-extrabold tracking-[0.2em] text-[var(--moss)] uppercase">

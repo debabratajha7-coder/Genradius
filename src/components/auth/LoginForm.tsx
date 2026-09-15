@@ -142,8 +142,8 @@ function LoginFormInner() {
   };
 
   return (
-    <FadeIn className="mx-auto w-full max-w-md px-4 py-10 sm:py-16">
-      <div className="rounded-md border-2 border-[var(--ink)] bg-[var(--sand)]/40 p-6 shadow-[6px_6px_0_0_var(--ink)] sm:p-8">
+    <FadeIn className="mx-auto w-full max-w-md px-0 py-0 sm:px-4 sm:py-16">
+      <div className="min-h-[calc(100dvh-8rem)] border-0 bg-[var(--background)] p-5 sm:min-h-0 sm:rounded-md sm:border-2 sm:border-[var(--ink)] sm:bg-[var(--sand)]/40 sm:p-8 sm:shadow-[6px_6px_0_0_var(--ink)]">
         <p className="text-[11px] font-extrabold tracking-[0.2em] text-[var(--moss)] uppercase">
           Member access
         </p>

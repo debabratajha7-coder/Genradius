@@ -15,7 +15,43 @@ export function Footer() {
 
   return (
     <footer className="mt-auto bg-[var(--earth)] text-[var(--silver)]">
-      <div className="mx-auto max-w-7xl px-4 pt-12 pb-6 sm:px-6">
+      {/* Compact mobile footer */}
+      <div className="px-4 pt-8 pb-4 md:hidden">
+        <p className="font-[family-name:var(--font-display)] text-2xl font-extrabold tracking-wide text-[var(--sand)] uppercase">
+          Own your radius
+        </p>
+        <form
+          onSubmit={onSubscribe}
+          className="mt-4 flex overflow-hidden rounded-xl border-2 border-[var(--ink)] bg-[var(--background)] shadow-[3px_3px_0_0_var(--ink)]"
+        >
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email for drops"
+            className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm text-[var(--ink)] outline-none"
+          />
+          <button
+            type="submit"
+            className="border-l-2 border-[var(--ink)] bg-[var(--sand)] px-4 py-3 text-[10px] font-extrabold tracking-widest text-[var(--ink)] uppercase"
+          >
+            Join
+          </button>
+        </form>
+        <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-bold tracking-wider uppercase">
+          <Link href="/shop">Shop</Link>
+          <Link href="/login">Log in</Link>
+          <Link href="/account">Account</Link>
+          <a href="mailto:hello@genradius.com">Support</a>
+        </div>
+        <p className="mt-5 text-[10px] text-[var(--silver)]/70">
+          © Genradius {new Date().getFullYear()}
+        </p>
+      </div>
+
+      {/* Full desktop footer */}
+      <div className="mx-auto hidden max-w-7xl px-4 pt-12 pb-6 sm:px-6 md:block">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <h2 className="font-[family-name:var(--font-display)] text-3xl font-extrabold tracking-wide text-[var(--sand)] uppercase sm:text-4xl md:text-5xl">
             Join the Genradius Circle
@@ -111,12 +147,6 @@ export function Footer() {
               <li>
                 <Link href="/shop">FAQs</Link>
               </li>
-              <li>
-                <Link href="/shop">Shipping Policy</Link>
-              </li>
-              <li>
-                <Link href="/shop">Refund Policy</Link>
-              </li>
             </ul>
           </div>
         </div>
@@ -133,7 +163,7 @@ export function Footer() {
           <button
             type="button"
             onClick={scrollTop}
-            className="flex h-9 w-9 items-center justify-center rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[3px_3px_0_0_var(--ink)] hover:translate-x-px hover:translate-y-px hover:shadow-[2px_2px_0_0_var(--ink)]"
+            className="flex h-9 w-9 items-center justify-center rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[3px_3px_0_0_var(--ink)]"
             aria-label="Back to top"
           >
             ˄

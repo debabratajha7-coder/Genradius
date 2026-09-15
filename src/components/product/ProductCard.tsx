@@ -24,6 +24,7 @@ export function ProductCard({ product }: { product: ProductLean }) {
     <motion.article
       layout
       whileHover={{ y: -6 }}
+      whileTap={{ scale: 0.985 }}
       transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
       className="group card-luxe flex h-full w-full flex-col overflow-hidden"
     >
@@ -75,37 +76,37 @@ export function ProductCard({ product }: { product: ProductLean }) {
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col px-3.5 pt-3.5">
-        <div className="flex flex-wrap items-baseline gap-2">
-          <span className="text-base font-extrabold tracking-tight">
+      <div className="flex flex-1 flex-col px-2.5 pt-2.5 sm:px-3.5 sm:pt-3.5">
+        <div className="flex flex-wrap items-baseline gap-1.5 sm:gap-2">
+          <span className="text-sm font-extrabold tracking-tight sm:text-base">
             {formatINR(product.price)}
           </span>
           {product.compareAtPrice > product.price && (
             <>
-              <span className="text-sm text-[var(--muted)] line-through">
+              <span className="text-xs text-[var(--muted)] line-through sm:text-sm">
                 {formatINR(product.compareAtPrice)}
               </span>
-              <span className="text-xs font-bold text-[var(--olive)]">
+              <span className="text-[10px] font-bold text-[var(--olive)] sm:text-xs">
                 {off}% OFF
               </span>
             </>
           )}
         </div>
-        <p className="mt-1 flex items-center gap-1 text-xs font-semibold text-[var(--olive)]">
+        <p className="mt-1 flex items-center gap-1 text-[10px] font-semibold text-[var(--olive)] sm:text-xs">
           Best price {formatINR(bestPrice(product.price))}
         </p>
         <Link
           href={`/product/${product.slug}`}
-          className="mt-1.5 line-clamp-1 text-sm text-[var(--muted)] transition hover:text-[var(--ink)]"
+          className="mt-1 line-clamp-2 text-xs leading-snug text-[var(--muted)] transition hover:text-[var(--ink)] sm:mt-1.5 sm:line-clamp-1 sm:text-sm"
         >
           {product.title}
         </Link>
       </div>
 
-      <div className="mt-3 border-t border-[var(--border)]">
+      <div className="mt-2 border-t border-[var(--border)] sm:mt-3">
         <button
           type="button"
-          className="w-full py-3.5 text-xs font-extrabold tracking-[0.16em] text-[var(--ink)] uppercase transition hover:bg-[var(--sand)]"
+          className="w-full py-3 text-[10px] font-extrabold tracking-[0.14em] text-[var(--ink)] uppercase transition active:bg-[var(--sand)] sm:py-3.5 sm:text-xs sm:tracking-[0.16em] sm:hover:bg-[var(--sand)]"
           onClick={() =>
             addItem({
               productId: product._id,

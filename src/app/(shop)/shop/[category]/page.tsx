@@ -31,37 +31,39 @@ export default async function CategoryPage({ params }: Props) {
   ]);
 
   return (
-    <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6">
-      <p className="text-xs font-bold tracking-[0.2em] text-[var(--muted)] uppercase">
+    <div className="mx-auto max-w-[1400px] px-3 py-5 sm:px-6 sm:py-10">
+      <p className="text-[10px] font-bold tracking-[0.2em] text-[var(--muted)] uppercase sm:text-xs">
         <Link href="/shop" className="hover:text-black">
           Shop
         </Link>{" "}
         / {cat.name}
       </p>
-      <h1 className="mt-2 font-[family-name:var(--font-display)] text-4xl tracking-wide uppercase sm:text-5xl">
+      <h1 className="mt-2 font-[family-name:var(--font-display)] text-[1.85rem] leading-none tracking-wide uppercase sm:text-5xl">
         {cat.name}
       </h1>
-      <p className="mt-2 text-sm text-[var(--muted)]">
+      <p className="mt-1.5 text-xs text-[var(--muted)] sm:mt-2 sm:text-sm">
         {products.length} styles
       </p>
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        {categories.map((c) => (
-          <Link
-            key={c._id}
-            href={`/shop/${c.slug}`}
-            className={`rounded-md border-2 px-3 py-1.5 text-[11px] font-bold tracking-wider uppercase ${
-              c.slug === slug
-                ? "border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[2px_2px_0_0_var(--ink)]"
-                : "border-[var(--ink)] bg-[var(--background)] text-[var(--muted)] shadow-[2px_2px_0_0_var(--ink)] hover:bg-[var(--accent-soft)]"
-            }`}
-          >
-            {c.name}
-          </Link>
-        ))}
+      <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-20 -mx-3 mt-4 border-y border-[var(--border)] bg-[var(--background)]/95 px-3 py-2.5 backdrop-blur-md sm:static sm:mx-0 sm:mt-6 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none">
+        <div className="flex gap-2 overflow-x-auto scrollbar-none">
+          {categories.map((c) => (
+            <Link
+              key={c._id}
+              href={`/shop/${c.slug}`}
+              className={`shrink-0 rounded-md border-2 px-3.5 py-2 text-[11px] font-bold tracking-wider uppercase ${
+                c.slug === slug
+                  ? "border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[2px_2px_0_0_var(--ink)]"
+                  : "border-[var(--ink)] bg-[var(--background)] text-[var(--muted)] shadow-[2px_2px_0_0_var(--ink)]"
+              }`}
+            >
+              {c.name}
+            </Link>
+          ))}
+        </div>
       </div>
 
-      <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+      <div className="app-product-grid mt-4 grid grid-cols-2 gap-3 sm:mt-10 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
         {products.map((p) => (
           <ProductCard key={p._id} product={p} />
         ))}

@@ -21,7 +21,7 @@ export function PromoTicker({ texts }: { texts: string[] }) {
 
   return (
     <div className="relative z-40 bg-[var(--ticker)] text-white">
-      <div className="mx-auto flex h-9 max-w-7xl items-center justify-center gap-4 px-8 sm:h-10 sm:px-10">
+      <div className="mx-auto flex h-8 max-w-7xl items-center justify-center gap-4 px-8 md:h-10 sm:px-10">
         <button
           type="button"
           onClick={prev}
@@ -39,7 +39,7 @@ export function PromoTicker({ texts }: { texts: string[] }) {
         <button
           type="button"
           onClick={next}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-lg leading-none opacity-80 hover:opacity-100 sm:right-6"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-lg leading-none opacity-80 hover:opacity-100 sm:right-6"
           aria-label="Next promo"
         >
           ›

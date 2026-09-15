@@ -29,7 +29,7 @@ export function ProductCarousel({
   if (!products.length) return null;
 
   return (
-    <section className="mx-auto max-w-[1400px] px-3 py-10 sm:px-6 sm:py-14">
+    <section className="mx-auto max-w-[1400px] px-3 py-8 sm:px-6 sm:py-14">
       <Reveal>
         <h2 className="section-title mb-6 sm:mb-10">{title}</h2>
       </Reveal>
