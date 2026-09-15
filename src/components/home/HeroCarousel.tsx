@@ -50,7 +50,7 @@ export function HeroCarousel() {
 
   return (
     <section className="relative isolate w-full overflow-hidden bg-[var(--ink)]">
-      <div className="relative min-h-[78vh] w-full sm:min-h-[85vh]">
+      <div className="relative min-h-[70dvh] w-full sm:min-h-[85vh]">
         <AnimatePresence mode="wait">
           <motion.div
             key={slide.image}
@@ -73,14 +73,14 @@ export function HeroCarousel() {
           </motion.div>
         </AnimatePresence>
 
-        <div className="absolute inset-0 flex flex-col justify-end px-6 pb-16 sm:px-14 sm:pb-20 md:px-20 md:pb-24">
+        <div className="absolute inset-0 flex flex-col justify-end px-4 pb-14 sm:px-14 sm:pb-20 md:px-20 md:pb-24">
           <FadeIn delay={0.1}>
             <motion.span
               key={`eye-${index}`}
               initial={reduce ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease }}
-              className="mb-4 inline-block w-fit -rotate-2 border border-[var(--ink)] bg-[var(--sand)] px-3 py-1 text-[11px] font-extrabold tracking-[0.2em] text-[var(--ink)] uppercase shadow-[3px_3px_0_0_var(--ink)]"
+              className="mb-3 inline-block w-fit -rotate-2 border border-[var(--ink)] bg-[var(--sand)] px-2.5 py-1 text-[10px] font-extrabold tracking-[0.2em] text-[var(--ink)] uppercase shadow-[3px_3px_0_0_var(--ink)] sm:mb-4 sm:px-3 sm:text-[11px]"
             >
               {slide.eyebrow}
             </motion.span>
@@ -91,7 +91,7 @@ export function HeroCarousel() {
             initial={reduce ? false : { opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.08, ease }}
-            className="font-[family-name:var(--font-display)] text-5xl font-extrabold tracking-[0.04em] text-white uppercase sm:text-7xl md:text-8xl"
+            className="font-[family-name:var(--font-display)] text-[2.65rem] leading-[0.95] font-extrabold tracking-[0.04em] text-white uppercase sm:text-7xl md:text-8xl"
           >
             {slide.title}
           </motion.p>
@@ -100,7 +100,7 @@ export function HeroCarousel() {
             initial={reduce ? false : { opacity: 0, y: 36 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.16, ease }}
-            className="font-[family-name:var(--font-logo)] text-5xl tracking-wide text-transparent uppercase sm:text-7xl md:text-8xl"
+            className="font-[family-name:var(--font-logo)] text-[2.65rem] leading-[0.95] tracking-wide text-transparent uppercase sm:text-7xl md:text-8xl"
             style={{
               backgroundImage: "linear-gradient(180deg, #be9c7d, #cbcfd0)",
               WebkitBackgroundClip: "text",
@@ -114,19 +114,19 @@ export function HeroCarousel() {
             initial={reduce ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.28, ease }}
-            className="mt-8 flex flex-wrap items-center gap-4"
+            className="mt-6 flex w-full max-w-sm flex-col gap-3 sm:mt-8 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
           >
-            <Link href={slide.href} className="btn-accent px-9 py-3.5 text-sm">
+            <Link href={slide.href} className="btn-accent w-full px-8 py-3.5 text-sm sm:w-auto sm:px-9">
               Shop now
             </Link>
             <Link
               href="/shop"
-              className="border border-white/40 px-6 py-3 text-xs font-bold tracking-[0.18em] text-white uppercase backdrop-blur-sm transition hover:bg-white hover:text-[var(--ink)]"
+              className="border border-white/40 px-6 py-3 text-center text-xs font-bold tracking-[0.18em] text-white uppercase backdrop-blur-sm transition hover:bg-white hover:text-[var(--ink)] sm:text-left"
             >
               Explore all
             </Link>
           </motion.div>
-          <p className="mt-5 text-[10px] tracking-wide text-white/55">
+          <p className="mt-4 hidden text-[10px] tracking-wide text-white/55 sm:mt-5 sm:block">
             Demo catalog live — replace photos from Admin when ready.
           </p>
         </div>
@@ -136,7 +136,7 @@ export function HeroCarousel() {
           onClick={() =>
             setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length)
           }
-          className="absolute top-1/2 left-3 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[3px_3px_0_0_var(--ink)] transition hover:translate-x-0.5 hover:translate-y-[calc(-50%+2px)] sm:left-6"
+          className="absolute top-1/2 left-2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[3px_3px_0_0_var(--ink)] transition hover:translate-x-0.5 hover:translate-y-[calc(-50%+2px)] sm:left-6 sm:flex"
           aria-label="Previous slide"
         >
           ‹
@@ -144,13 +144,13 @@ export function HeroCarousel() {
         <button
           type="button"
           onClick={() => setIndex((i) => (i + 1) % SLIDES.length)}
-          className="absolute top-1/2 right-3 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[3px_3px_0_0_var(--ink)] transition hover:-translate-x-0.5 hover:translate-y-[calc(-50%+2px)] sm:right-6"
+          className="absolute top-1/2 right-2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[3px_3px_0_0_var(--ink)] transition hover:-translate-x-0.5 hover:translate-y-[calc(-50%+2px)] sm:right-6 sm:flex"
           aria-label="Next slide"
         >
           ›
         </button>
 
-        <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
+        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2 sm:bottom-6">
           {SLIDES.map((_, i) => (
             <button
               key={i}

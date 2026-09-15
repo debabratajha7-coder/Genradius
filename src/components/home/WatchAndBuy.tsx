@@ -20,7 +20,7 @@ export function WatchAndBuy({
   if (!hasReels && !productFallback.length) return null;
 
   return (
-    <section className="relative my-6 overflow-hidden py-14 sm:py-16">
+    <section className="relative my-4 overflow-hidden py-10 sm:my-6 sm:py-16">
       <div
         className="absolute inset-0 -z-10"
         style={{
@@ -45,7 +45,7 @@ export function WatchAndBuy({
             : "Tap a frame — same size cards, deeper stage."}
         </p>
 
-        <div className="relative rounded-2xl border-2 border-[var(--ink)] bg-white/35 p-4 shadow-[8px_8px_0_0_rgba(42,41,30,0.15)] backdrop-blur-sm sm:p-6">
+        <div className="relative rounded-2xl border-2 border-[var(--ink)] bg-white/35 p-3 shadow-[6px_6px_0_0_rgba(42,41,30,0.15)] backdrop-blur-sm sm:p-6 sm:shadow-[8px_8px_0_0_rgba(42,41,30,0.15)]">
           <div
             className="pointer-events-none absolute inset-x-6 bottom-3 h-8 rounded-[100%] bg-[var(--ink)]/10 blur-md"
             aria-hidden
@@ -56,7 +56,7 @@ export function WatchAndBuy({
             onClick={() =>
               scroller.current?.scrollBy({ left: -280, behavior: "smooth" })
             }
-            className="absolute top-1/2 left-2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] text-lg shadow-[3px_3px_0_0_var(--ink)] sm:left-3"
+            className="absolute top-1/2 left-2 z-20 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] text-lg shadow-[3px_3px_0_0_var(--ink)] sm:left-3 sm:flex"
             aria-label="Scroll left"
           >
             ‹
@@ -66,7 +66,7 @@ export function WatchAndBuy({
             onClick={() =>
               scroller.current?.scrollBy({ left: 280, behavior: "smooth" })
             }
-            className="absolute top-1/2 right-2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] text-lg shadow-[3px_3px_0_0_var(--ink)] sm:right-3"
+            className="absolute top-1/2 right-2 z-20 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] text-lg shadow-[3px_3px_0_0_var(--ink)] sm:right-3 sm:flex"
             aria-label="Scroll right"
           >
             ›
@@ -74,7 +74,7 @@ export function WatchAndBuy({
 
           <div
             ref={scroller}
-            className="flex items-stretch gap-5 overflow-x-auto px-8 pb-4 pt-2 scrollbar-none sm:px-10"
+            className="snap-x-mandatory flex items-stretch gap-3 overflow-x-auto px-1 pb-4 pt-2 scrollbar-none sm:gap-5 sm:px-10"
             style={{ scrollbarWidth: "none" }}
           >
             {hasReels
@@ -89,7 +89,7 @@ export function WatchAndBuy({
                       href={href}
                       target={external ? "_blank" : undefined}
                       rel={external ? "noreferrer" : undefined}
-                      className="group relative w-[200px] shrink-0 sm:w-[220px]"
+                      className="snap-start group relative w-[min(58vw,200px)] shrink-0 sm:w-[220px]"
                     >
                       <span
                         className="absolute inset-0 translate-x-2 translate-y-2 rounded-xl bg-[#6ba8c9]/50 transition group-hover:translate-x-3 group-hover:translate-y-3"
@@ -140,7 +140,7 @@ export function WatchAndBuy({
                     <Link
                       key={p._id}
                       href={`/product/${p.slug}`}
-                      className="group relative w-[200px] shrink-0 sm:w-[220px]"
+                      className="snap-start group relative w-[min(58vw,200px)] shrink-0 sm:w-[220px]"
                     >
                       <span
                         className="absolute inset-0 translate-x-2 translate-y-2 rounded-xl bg-[#6ba8c9]/50"

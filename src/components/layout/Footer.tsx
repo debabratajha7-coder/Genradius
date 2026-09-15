@@ -100,6 +100,12 @@ export function Footer() {
             </h3>
             <ul className="space-y-2 text-sm font-semibold uppercase">
               <li>
+                <Link href="/login">Log in</Link>
+              </li>
+              <li>
+                <Link href="/account">My account</Link>
+              </li>
+              <li>
                 <Link href="/shop">Contact Us</Link>
               </li>
               <li>

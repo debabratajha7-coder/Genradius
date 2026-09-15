@@ -21,18 +21,18 @@ export function PromoTicker({ texts }: { texts: string[] }) {
 
   return (
     <div className="relative z-40 bg-[var(--ticker)] text-white">
-      <div className="mx-auto flex h-10 max-w-7xl items-center justify-center gap-4 px-10">
+      <div className="mx-auto flex h-9 max-w-7xl items-center justify-center gap-4 px-8 sm:h-10 sm:px-10">
         <button
           type="button"
           onClick={prev}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-lg leading-none opacity-80 hover:opacity-100 sm:left-6"
+          className="absolute left-2 top-1/2 -translate-y-1/2 text-lg leading-none opacity-80 hover:opacity-100 sm:left-6"
           aria-label="Previous promo"
         >
           ‹
         </button>
         <p
           key={index}
-          className="animate-ticker text-center text-[11px] font-semibold tracking-[0.16em] uppercase sm:text-xs"
+          className="animate-ticker line-clamp-1 px-2 text-center text-[10px] font-semibold tracking-[0.12em] uppercase sm:text-xs sm:tracking-[0.16em]"
         >
           {texts[index]}
         </p>
