@@ -22,7 +22,7 @@ export function SiteShell({
         <div className="app-shell flex min-h-dvh flex-col">
           <PromoTicker texts={promoTexts} />
           <Header />
-          <main className="app-main flex-1 pb-[calc(var(--app-tabbar-h)+env(safe-area-inset-bottom)+0.5rem)] md:pb-0">
+          <main className="app-main flex-1 pb-2 lg:pb-0">
             {children}
           </main>
           <Footer />

@@ -36,6 +36,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -43,7 +44,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-body), system-ui, sans-serif;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  overflow-x: clip;
   min-height: 100dvh;
   -webkit-tap-highlight-color: transparent;
 }
@@ -283,7 +284,7 @@ body::before {
   scroll-snap-align: start;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1023px) {
   .btn-accent {
     box-shadow: 4px 4px 0 0 var(--ink);
     min-height: 48px;
@@ -309,21 +310,29 @@ body::before {
   }
 
   .section-title {
-    font-size: clamp(1.35rem, 6.5vw, 1.85rem);
+    font-size: clamp(1.25rem, 5.5vw, 1.75rem);
     letter-spacing: 0.06em;
+  }
+
+  .brand-logo-lg {
+    font-size: clamp(0.95rem, 3.8vw, 1.25rem);
   }
 
   .app-tabbar {
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Tighter product grids feel more native */
   .app-product-grid {
     gap: 0.65rem;
   }
+
+  /* Keep page scrollable; avoid nested overflow traps */
+  .app-shell {
+    overflow-x: clip;
+  }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .app-tabbar {
     display: none !important;
   }

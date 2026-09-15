@@ -62,7 +62,7 @@ export function MobileTabBar() {
 
   return (
     <nav
-      className="app-tabbar fixed inset-x-0 bottom-0 z-[45] border-t-2 border-[var(--ink)] bg-[var(--background)]/95 shadow-[0_-8px_30px_rgba(42,41,30,0.08)] backdrop-blur-xl md:hidden"
+      className="app-tabbar fixed inset-x-0 bottom-0 z-[45] border-t-2 border-[var(--ink)] bg-[var(--background)]/95 shadow-[0_-8px_30px_rgba(42,41,30,0.08)] backdrop-blur-xl lg:hidden"
       aria-label="App navigation"
     >
       <div className="mx-auto grid h-[var(--app-tabbar-h)] max-w-lg grid-cols-4 px-1">

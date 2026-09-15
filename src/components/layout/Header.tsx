@@ -72,7 +72,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--background)]/92 shadow-[0_8px_30px_rgba(42,41,30,0.04)] backdrop-blur-xl pt-[env(safe-area-inset-top)]">
       {/* Mobile app bar */}
-      <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-2 px-3 md:hidden">
+      <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-2 px-3 lg:hidden">
         <button
           type="button"
           className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[var(--ink)] bg-[var(--sand)] shadow-[2px_2px_0_0_var(--ink)]"
@@ -113,7 +113,7 @@ export function Header() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.28, ease }}
-            className="overflow-hidden border-t border-[var(--border)] px-3 pb-3 md:hidden"
+            className="overflow-hidden border-t border-[var(--border)] px-3 pb-3 lg:hidden"
           >
             <div className="mt-3 flex items-center rounded-xl border-2 border-[var(--ink)] bg-white px-3 py-2.5 shadow-[2px_2px_0_0_var(--ink)]">
               <span className="mr-2 text-[var(--moss)]" aria-hidden>
@@ -132,7 +132,7 @@ export function Header() {
       </AnimatePresence>
 
       {/* Desktop bar */}
-      <div className="mx-auto hidden h-16 max-w-[1400px] items-center gap-3 px-6 md:flex">
+      <div className="mx-auto hidden h-16 max-w-[1400px] items-center gap-3 px-6 lg:flex">
         <div className="min-w-0">
           <BrandLogo />
         </div>
@@ -180,7 +180,7 @@ export function Header() {
 
         <form
           onSubmit={onSearch}
-          className="ml-auto hidden min-w-0 max-w-xs flex-1 items-center rounded-md border-2 border-[var(--ink)] bg-[var(--background)] px-3 py-1.5 shadow-[3px_3px_0_0_var(--ink)] md:flex lg:max-w-sm"
+          className="ml-auto hidden min-w-0 max-w-xs flex-1 items-center rounded-md border-2 border-[var(--ink)] bg-[var(--background)] px-3 py-1.5 shadow-[3px_3px_0_0_var(--ink)] lg:flex lg:max-w-sm"
         >
           <span className="mr-2 text-[var(--ink)]" aria-hidden>
             ⌕
@@ -227,14 +227,14 @@ export function Header() {
         {mobileOpen && (
           <>
             <motion.div
-              className="fixed inset-0 z-40 bg-[var(--ink)]/45 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-40 bg-[var(--ink)]/45 backdrop-blur-sm lg:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
             />
             <motion.aside
-              className="fixed top-0 left-0 z-50 flex h-[100dvh] w-[min(100%,22rem)] flex-col border-r-2 border-[var(--ink)] bg-[var(--background)] shadow-[8px_0_0_0_var(--ink)] md:hidden"
+              className="fixed top-0 left-0 z-50 flex h-[100dvh] w-[min(100%,22rem)] flex-col border-r-2 border-[var(--ink)] bg-[var(--background)] shadow-[8px_0_0_0_var(--ink)] lg:hidden"
               initial={reduce ? false : { x: "-105%" }}
               animate={{ x: 0 }}
               exit={{ x: "-105%" }}

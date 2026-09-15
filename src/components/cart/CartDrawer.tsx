@@ -26,7 +26,7 @@ export function CartDrawer() {
 
           {/* Mobile: bottom sheet */}
           <motion.aside
-            className="fixed inset-x-0 bottom-0 z-50 flex max-h-[88dvh] flex-col rounded-t-2xl border-2 border-b-0 border-[var(--ink)] bg-white text-[var(--foreground)] shadow-[0_-12px_40px_rgba(42,41,30,0.18)] md:hidden"
+            className="fixed inset-x-0 bottom-0 z-50 flex max-h-[88dvh] flex-col rounded-t-2xl border-2 border-b-0 border-[var(--ink)] bg-white text-[var(--foreground)] shadow-[0_-12px_40px_rgba(42,41,30,0.18)] lg:hidden"
             initial={reduce ? false : { y: "105%" }}
             animate={{ y: 0 }}
             exit={{ y: "105%" }}
@@ -60,7 +60,7 @@ export function CartDrawer() {
 
           {/* Desktop: side drawer */}
           <motion.aside
-            className="fixed top-0 right-0 z-50 hidden h-full w-full max-w-md flex-col bg-white text-[var(--foreground)] shadow-2xl md:flex"
+            className="fixed top-0 right-0 z-50 hidden h-full w-full max-w-md flex-col bg-white text-[var(--foreground)] shadow-2xl lg:flex"
             initial={reduce ? false : { x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}

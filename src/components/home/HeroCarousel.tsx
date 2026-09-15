@@ -50,7 +50,7 @@ export function HeroCarousel() {
 
   return (
     <section className="relative isolate w-full overflow-hidden bg-[var(--ink)]">
-      <div className="relative min-h-[70dvh] w-full sm:min-h-[85vh]">
+      <div className="relative min-h-[58dvh] w-full sm:min-h-[75vh] lg:min-h-[85vh]">
         <AnimatePresence mode="wait">
           <motion.div
             key={slide.image}
@@ -91,7 +91,7 @@ export function HeroCarousel() {
             initial={reduce ? false : { opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.08, ease }}
-            className="font-[family-name:var(--font-display)] text-[2.65rem] leading-[0.95] font-extrabold tracking-[0.04em] text-white uppercase sm:text-7xl md:text-8xl"
+            className="font-[family-name:var(--font-display)] text-[2.15rem] leading-[0.95] font-extrabold tracking-[0.04em] text-white uppercase sm:text-6xl md:text-7xl lg:text-8xl"
           >
             {slide.title}
           </motion.p>
@@ -100,7 +100,7 @@ export function HeroCarousel() {
             initial={reduce ? false : { opacity: 0, y: 36 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.16, ease }}
-            className="font-[family-name:var(--font-logo)] text-[2.65rem] leading-[0.95] tracking-wide text-transparent uppercase sm:text-7xl md:text-8xl"
+            className="font-[family-name:var(--font-logo)] text-[2.15rem] leading-[0.95] tracking-wide text-transparent uppercase sm:text-6xl md:text-7xl lg:text-8xl"
             style={{
               backgroundImage: "linear-gradient(180deg, #be9c7d, #cbcfd0)",
               WebkitBackgroundClip: "text",
