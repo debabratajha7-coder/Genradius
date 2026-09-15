@@ -11,21 +11,30 @@ import { RecentlyViewed } from "@/components/home/RecentlyViewed";
 import { Reveal } from "@/components/motion/Reveal";
 import { getCategories, getProducts } from "@/lib/products";
 import { getActiveReels } from "@/lib/reels";
+import { getHeroSlides } from "@/lib/hero";
 
 export default async function HomePage() {
-  const [categories, bestsellers, centreStage, newArrivals, watch, reels] =
-    await Promise.all([
-      getCategories(),
-      getProducts({ featured: true, limit: 12 }),
-      getProducts({ collection: "premium", limit: 10 }),
-      getProducts({ collection: "radius-range", limit: 10 }),
-      getProducts({ limit: 10 }),
-      getActiveReels(12),
-    ]);
+  const [
+    categories,
+    bestsellers,
+    centreStage,
+    newArrivals,
+    watch,
+    reels,
+    heroSlides,
+  ] = await Promise.all([
+    getCategories(),
+    getProducts({ featured: true, limit: 12 }),
+    getProducts({ collection: "premium", limit: 10 }),
+    getProducts({ collection: "radius-range", limit: 10 }),
+    getProducts({ limit: 10 }),
+    getActiveReels(12),
+    getHeroSlides(),
+  ]);
 
   return (
     <>
-      <HeroCarousel />
+      <HeroCarousel slides={heroSlides} />
       <ProductCarousel
         title="Our Bestsellers"
         products={bestsellers}

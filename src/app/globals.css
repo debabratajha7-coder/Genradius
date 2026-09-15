@@ -322,13 +322,28 @@ body::before {
     padding-bottom: env(safe-area-inset-bottom);
   }
 
+  body[data-menu-open="1"] .app-tabbar {
+    transform: translateY(110%);
+    pointer-events: none;
+    opacity: 0;
+  }
+
   .app-product-grid {
     gap: 0.65rem;
   }
 
-  /* Keep page scrollable; avoid nested overflow traps */
   .app-shell {
     overflow-x: clip;
+  }
+
+  /* Tighter section rhythm on phone */
+  .section-title {
+    margin-bottom: 1rem;
+  }
+
+  .section-title::after {
+    margin-top: 0.55rem;
+    width: 36px;
   }
 }
 

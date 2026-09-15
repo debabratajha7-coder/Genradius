@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 
 const LINKS = [
   { href: "/admin", label: "Dashboard" },
+  { href: "/admin/hero", label: "Hero" },
   { href: "/admin/products", label: "Products" },
   { href: "/admin/reels", label: "Reels" },
   { href: "/admin/categories", label: "Categories" },
@@ -39,7 +40,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
                 key={l.href}
                 href={l.href}
                 className={`rounded-md border-2 border-[var(--ink)] px-3 py-1.5 text-xs font-extrabold uppercase shadow-[2px_2px_0_0_var(--ink)] ${
-                  pathname === l.href
+                  pathname === l.href ||
+                  (l.href !== "/admin" && pathname.startsWith(l.href))
                     ? "bg-[var(--olive)]"
                     : "bg-[var(--background)] hover:bg-[var(--accent-soft)]"
                 }`}

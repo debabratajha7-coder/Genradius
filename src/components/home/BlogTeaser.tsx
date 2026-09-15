@@ -24,9 +24,36 @@ const BLOGS = [
 
 export function BlogTeaser() {
   return (
-    <section id="blogs" className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6">
-      <h2 className="section-title mb-8">Explore More Blogs</h2>
-      <div className="grid gap-5 sm:grid-cols-3">
+    <section id="blogs" className="mx-auto max-w-[1400px] px-3 py-7 sm:px-6 sm:py-10">
+      <h2 className="section-title mb-4 sm:mb-8">Explore More Blogs</h2>
+
+      {/* Phone: horizontal snap cards */}
+      <div className="snap-x-mandatory flex gap-3 overflow-x-auto pb-2 scrollbar-none lg:hidden">
+        {BLOGS.map((b) => (
+          <article
+            key={b.title}
+            className="snap-start w-[min(78vw,280px)] shrink-0 overflow-hidden rounded-md border-2 border-[var(--ink)] bg-white shadow-[2px_2px_0_0_var(--ink)]"
+          >
+            <div className="relative aspect-[16/10]">
+              <Image
+                src={b.image}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="280px"
+              />
+            </div>
+            <div className="p-3">
+              <p className="text-[10px] text-[var(--muted)]">{b.date}</p>
+              <h3 className="mt-1 line-clamp-2 text-xs font-bold leading-snug">
+                {b.title}
+              </h3>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div className="mt-5 hidden gap-5 sm:grid-cols-3 lg:grid">
         {BLOGS.map((b) => (
           <article
             key={b.title}
@@ -38,7 +65,7 @@ export function BlogTeaser() {
                 alt=""
                 fill
                 className="object-cover"
-                sizes="(max-width:768px) 100vw, 33vw"
+                sizes="33vw"
               />
             </div>
             <div className="p-4">
@@ -48,8 +75,12 @@ export function BlogTeaser() {
           </article>
         ))}
       </div>
-      <div className="mt-8 flex justify-center">
-        <Link href="/#blogs" className="btn-accent px-10 py-3.5 text-sm">
+
+      <div className="mt-5 flex justify-center sm:mt-8">
+        <Link
+          href="/#blogs"
+          className="btn-accent w-full max-w-xs px-8 py-3 text-center text-xs sm:w-auto sm:px-10 sm:py-3.5 sm:text-sm"
+        >
           Explore more blogs
         </Link>
       </div>

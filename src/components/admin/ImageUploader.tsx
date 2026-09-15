@@ -7,11 +7,17 @@ export function ImageUploader({
   onChange,
   label = "Product images",
   folder = "genradius/products",
+  max,
+  replaceOnUpload = false,
 }: {
   images: string[];
   onChange: (urls: string[]) => void;
   label?: string;
   folder?: string;
+  /** Cap how many images are kept */
+  max?: number;
+  /** New uploads replace existing instead of appending */
+  replaceOnUpload?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -48,7 +54,13 @@ export function ImageUploader({
           if (!res.ok) throw new Error(data.error || "Upload failed");
           uploaded.push(data.url as string);
         }
-        onChange([...images, ...uploaded]);
+        onChange(
+          replaceOnUpload || max === 1
+            ? uploaded.slice(-(max ?? 1))
+            : max
+              ? [...images, ...uploaded].slice(0, max)
+              : [...images, ...uploaded],
+        );
       } catch (e) {
         setError(e instanceof Error ? e.message : "Upload failed");
       } finally {
@@ -57,7 +69,7 @@ export function ImageUploader({
         if (inputRef.current) inputRef.current.value = "";
       }
     },
-    [folder, images, onChange],
+    [folder, images, onChange, max, replaceOnUpload],
   );
 
   function onDragOver(e: DragEvent) {

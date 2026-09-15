@@ -5,55 +5,37 @@ import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FadeIn } from "@/components/motion/Reveal";
-
-const SLIDES = [
-  {
-    image:
-      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1800&q=80",
-    eyebrow: "ATELIER",
-    title: "OWN YOUR",
-    highlight: "RADIUS",
-    href: "/shop?collection=premium",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1800&q=80",
-    eyebrow: "DROP",
-    title: "RADIUS RANGE",
-    highlight: "LIVE",
-    href: "/shop?collection=radius-range",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1800&q=80",
-    eyebrow: "MEMBERS",
-    title: "BUY 2 GET",
-    highlight: "MORE",
-    href: "/shop/sale",
-  },
-];
+import type { HeroSlideLean } from "@/lib/hero-defaults";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-export function HeroCarousel() {
+export function HeroCarousel({ slides }: { slides: HeroSlideLean[] }) {
   const [index, setIndex] = useState(0);
   const reduce = useReducedMotion();
+  const list = slides.length > 0 ? slides : [];
 
   useEffect(() => {
+    if (list.length <= 1) return;
     const id = setInterval(() => {
-      setIndex((i) => (i + 1) % SLIDES.length);
+      setIndex((i) => (i + 1) % list.length);
     }, 6200);
     return () => clearInterval(id);
-  }, []);
+  }, [list.length]);
 
-  const slide = SLIDES[index];
+  useEffect(() => {
+    if (index >= list.length) setIndex(0);
+  }, [list.length, index]);
+
+  if (!list.length) return null;
+
+  const slide = list[index] ?? list[0];
 
   return (
     <section className="relative isolate w-full overflow-hidden bg-[var(--ink)]">
       <div className="relative min-h-[58dvh] w-full sm:min-h-[75vh] lg:min-h-[85vh]">
         <AnimatePresence mode="wait">
           <motion.div
-            key={slide.image}
+            key={slide.image + slide._id}
             className="absolute inset-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -76,7 +58,7 @@ export function HeroCarousel() {
         <div className="absolute inset-0 flex flex-col justify-end px-4 pb-14 sm:px-14 sm:pb-20 md:px-20 md:pb-24">
           <FadeIn delay={0.1}>
             <motion.span
-              key={`eye-${index}`}
+              key={`eye-${slide._id}-${index}`}
               initial={reduce ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease }}
@@ -87,7 +69,7 @@ export function HeroCarousel() {
           </FadeIn>
 
           <motion.p
-            key={`t-${index}`}
+            key={`t-${slide._id}-${index}`}
             initial={reduce ? false : { opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.08, ease }}
@@ -95,29 +77,34 @@ export function HeroCarousel() {
           >
             {slide.title}
           </motion.p>
-          <motion.p
-            key={`h-${index}`}
-            initial={reduce ? false : { opacity: 0, y: 36 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.16, ease }}
-            className="font-[family-name:var(--font-logo)] text-[2.15rem] leading-[0.95] tracking-wide text-transparent uppercase sm:text-6xl md:text-7xl lg:text-8xl"
-            style={{
-              backgroundImage: "linear-gradient(180deg, #be9c7d, #cbcfd0)",
-              WebkitBackgroundClip: "text",
-            }}
-          >
-            {slide.highlight}
-          </motion.p>
+          {slide.highlight ? (
+            <motion.p
+              key={`h-${slide._id}-${index}`}
+              initial={reduce ? false : { opacity: 0, y: 36 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 0.16, ease }}
+              className="font-[family-name:var(--font-logo)] text-[2.15rem] leading-[0.95] tracking-wide text-transparent uppercase sm:text-6xl md:text-7xl lg:text-8xl"
+              style={{
+                backgroundImage: "linear-gradient(180deg, #be9c7d, #cbcfd0)",
+                WebkitBackgroundClip: "text",
+              }}
+            >
+              {slide.highlight}
+            </motion.p>
+          ) : null}
 
           <motion.div
-            key={`cta-${index}`}
+            key={`cta-${slide._id}-${index}`}
             initial={reduce ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.28, ease }}
             className="mt-6 flex w-full max-w-sm flex-col gap-3 sm:mt-8 sm:max-w-none sm:flex-row sm:flex-wrap sm:items-center sm:gap-4"
           >
-            <Link href={slide.href} className="btn-accent w-full px-8 py-3.5 text-sm sm:w-auto sm:px-9">
-              Shop now
+            <Link
+              href={slide.href || "/shop"}
+              className="btn-accent w-full px-8 py-3.5 text-sm sm:w-auto sm:px-9"
+            >
+              {slide.ctaLabel || "Shop now"}
             </Link>
             <Link
               href="/shop"
@@ -126,43 +113,44 @@ export function HeroCarousel() {
               Explore all
             </Link>
           </motion.div>
-          <p className="mt-4 hidden text-[10px] tracking-wide text-white/55 sm:mt-5 sm:block">
-            Demo catalog live — replace photos from Admin when ready.
-          </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() =>
-            setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length)
-          }
-          className="absolute top-1/2 left-2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[3px_3px_0_0_var(--ink)] transition hover:translate-x-0.5 hover:translate-y-[calc(-50%+2px)] sm:left-6 sm:flex"
-          aria-label="Previous slide"
-        >
-          ‹
-        </button>
-        <button
-          type="button"
-          onClick={() => setIndex((i) => (i + 1) % SLIDES.length)}
-          className="absolute top-1/2 right-2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[3px_3px_0_0_var(--ink)] transition hover:-translate-x-0.5 hover:translate-y-[calc(-50%+2px)] sm:right-6 sm:flex"
-          aria-label="Next slide"
-        >
-          ›
-        </button>
-
-        <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2 sm:bottom-6">
-          {SLIDES.map((_, i) => (
+        {list.length > 1 && (
+          <>
             <button
-              key={i}
               type="button"
-              onClick={() => setIndex(i)}
-              className={`h-1.5 rounded-full border border-white/40 transition-all duration-500 ${
-                i === index ? "w-8 bg-[var(--sand)]" : "w-1.5 bg-white/40"
-              }`}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
+              onClick={() =>
+                setIndex((i) => (i - 1 + list.length) % list.length)
+              }
+              className="absolute top-1/2 left-2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[3px_3px_0_0_var(--ink)] transition hover:translate-x-0.5 hover:translate-y-[calc(-50%+2px)] sm:left-6 sm:flex"
+              aria-label="Previous slide"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              onClick={() => setIndex((i) => (i + 1) % list.length)}
+              className="absolute top-1/2 right-2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-[var(--sand)] text-[var(--ink)] shadow-[3px_3px_0_0_var(--ink)] transition hover:-translate-x-0.5 hover:translate-y-[calc(-50%+2px)] sm:right-6 sm:flex"
+              aria-label="Next slide"
+            >
+              ›
+            </button>
+
+            <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2 sm:bottom-6">
+              {list.map((s, i) => (
+                <button
+                  key={s._id}
+                  type="button"
+                  onClick={() => setIndex(i)}
+                  className={`h-1.5 rounded-full border border-white/40 transition-all duration-500 ${
+                    i === index ? "w-8 bg-[var(--sand)]" : "w-1.5 bg-white/40"
+                  }`}
+                  aria-label={`Go to slide ${i + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

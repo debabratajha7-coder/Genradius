@@ -53,11 +53,16 @@ export function Header() {
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    if (!mobileOpen) return;
+    if (!mobileOpen) {
+      document.body.dataset.menuOpen = "0";
+      return;
+    }
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    document.body.dataset.menuOpen = "1";
     return () => {
       document.body.style.overflow = prev;
+      document.body.dataset.menuOpen = "0";
     };
   }, [mobileOpen]);
 
@@ -70,7 +75,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--background)]/92 shadow-[0_8px_30px_rgba(42,41,30,0.04)] backdrop-blur-xl pt-[env(safe-area-inset-top)]">
+    <header className="sticky top-0 z-[55] border-b border-[var(--border)] bg-[var(--background)]/92 shadow-[0_8px_30px_rgba(42,41,30,0.04)] backdrop-blur-xl pt-[env(safe-area-inset-top)]">
       {/* Mobile app bar */}
       <div className="mx-auto flex h-14 max-w-[1400px] items-center gap-2 px-3 lg:hidden">
         <button
@@ -225,104 +230,122 @@ export function Header() {
 
       <AnimatePresence>
         {mobileOpen && (
-          <>
-            <motion.div
-              className="fixed inset-0 z-40 bg-[var(--ink)]/45 backdrop-blur-sm lg:hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileOpen(false)}
-            />
-            <motion.aside
-              className="fixed top-0 left-0 z-50 flex h-[100dvh] w-[min(100%,22rem)] flex-col border-r-2 border-[var(--ink)] bg-[var(--background)] shadow-[8px_0_0_0_var(--ink)] lg:hidden"
-              initial={reduce ? false : { x: "-105%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-105%" }}
-              transition={{ duration: 0.4, ease }}
+          <motion.div
+            className="fixed inset-0 z-[70] flex flex-col bg-[var(--background)] lg:hidden"
+            initial={reduce ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.28, ease }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+          >
+            <div className="flex items-center justify-between border-b-2 border-[var(--ink)] px-4 py-3.5 pt-[max(0.85rem,env(safe-area-inset-top))]">
+              <p className="font-[family-name:var(--font-logo)] text-sm uppercase">
+                Browse
+              </p>
+              <button
+                type="button"
+                className="rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] px-3 py-1.5 text-[10px] font-extrabold tracking-widest uppercase shadow-[2px_2px_0_0_var(--ink)]"
+                onClick={() => setMobileOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            <form
+              onSubmit={onSearch}
+              className="border-b border-[var(--border)] px-4 py-3"
             >
-              <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-4 pt-[max(1rem,env(safe-area-inset-top))]">
-                <p className="font-[family-name:var(--font-logo)] text-sm uppercase">
-                  Browse
-                </p>
-                <button
-                  type="button"
-                  className="text-xs font-extrabold tracking-widest uppercase"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Close
-                </button>
+              <div className="flex items-center rounded-md border-2 border-[var(--ink)] bg-white px-3 py-2.5 shadow-[2px_2px_0_0_var(--ink)]">
+                <span className="mr-2 text-[var(--moss)]" aria-hidden>
+                  ⌕
+                </span>
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search tees, cargos…"
+                  className="w-full bg-transparent text-base outline-none"
+                />
               </div>
+            </form>
 
-              <nav className="flex-1 overflow-y-auto px-2 py-3">
-                {NAV.map((item, i) => (
-                  <motion.div
-                    key={item.label}
-                    initial={reduce ? false : { opacity: 0, x: -16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.05 + i * 0.05, duration: 0.35, ease }}
-                    className="border-b border-[var(--border)]/70"
-                  >
-                    <div className="flex items-center">
-                      <Link
-                        href={item.href}
-                        className="flex-1 px-3 py-3.5 text-sm font-extrabold tracking-[0.14em] uppercase"
-                        onClick={() => setMobileOpen(false)}
+            <nav className="flex-1 overflow-y-auto overscroll-contain px-2 py-2">
+              {NAV.map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  initial={reduce ? false : { opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.04 + i * 0.04, duration: 0.3, ease }}
+                  className="border-b border-[var(--border)]/70"
+                >
+                  <div className="flex items-center">
+                    <Link
+                      href={item.href}
+                      className="flex-1 px-3 py-4 text-[13px] font-extrabold tracking-[0.12em] uppercase"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                    {item.children.length > 0 && (
+                      <button
+                        type="button"
+                        className="min-h-11 min-w-11 px-3 text-lg"
+                        aria-label={`Expand ${item.label}`}
+                        onClick={() =>
+                          setExpanded((v) =>
+                            v === item.label ? null : item.label,
+                          )
+                        }
                       >
-                        {item.label}
-                      </Link>
-                      {item.children.length > 0 && (
-                        <button
-                          type="button"
-                          className="px-3 py-3.5 text-lg"
-                          aria-label={`Expand ${item.label}`}
-                          onClick={() =>
-                            setExpanded((v) =>
-                              v === item.label ? null : item.label,
-                            )
-                          }
-                        >
-                          {expanded === item.label ? "−" : "+"}
-                        </button>
-                      )}
-                    </div>
-                    <AnimatePresence initial={false}>
-                      {item.children.length > 0 && expanded === item.label && (
-                        <motion.ul
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease }}
-                          className="overflow-hidden bg-[var(--accent-soft)]/40"
-                        >
-                          {item.children.map((c) => (
-                            <li key={c.href}>
-                              <Link
-                                href={c.href}
-                                className="block px-5 py-2.5 text-sm text-[var(--moss)]"
-                                onClick={() => setMobileOpen(false)}
-                              >
-                                {c.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </motion.ul>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                ))}
-              </nav>
+                        {expanded === item.label ? "−" : "+"}
+                      </button>
+                    )}
+                  </div>
+                  <AnimatePresence initial={false}>
+                    {item.children.length > 0 && expanded === item.label && (
+                      <motion.ul
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.28, ease }}
+                        className="overflow-hidden bg-[var(--accent-soft)]/50"
+                      >
+                        {item.children.map((c) => (
+                          <li key={c.href}>
+                            <Link
+                              href={c.href}
+                              className="block px-5 py-3 text-sm text-[var(--moss)]"
+                              onClick={() => setMobileOpen(false)}
+                            >
+                              {c.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))}
+            </nav>
 
-              <div className="space-y-2 border-t border-[var(--border)] px-4 py-4 pb-[max(1rem,calc(env(safe-area-inset-bottom)+var(--app-tabbar-h)))]">
-                <Link
-                  href={user ? "/account" : "/login"}
-                  className="btn-accent flex w-full py-3.5 text-sm"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {user ? "My account" : "Log in"}
-                </Link>
-              </div>
-            </motion.aside>
-          </>
+            <div className="grid grid-cols-2 gap-2 border-t-2 border-[var(--ink)] px-4 py-3 pb-[max(0.85rem,env(safe-area-inset-bottom))]">
+              <Link
+                href={user ? "/account" : "/login"}
+                className="btn-accent py-3.5 text-center text-xs"
+                onClick={() => setMobileOpen(false)}
+              >
+                {user ? "Account" : "Log in"}
+              </Link>
+              <Link
+                href="/shop"
+                className="rounded-md border-2 border-[var(--ink)] bg-white py-3.5 text-center text-xs font-extrabold tracking-wider uppercase shadow-[2px_2px_0_0_var(--ink)]"
+                onClick={() => setMobileOpen(false)}
+              >
+                Shop all
+              </Link>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </header>

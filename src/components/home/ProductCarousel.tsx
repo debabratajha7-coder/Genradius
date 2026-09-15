@@ -58,7 +58,7 @@ export function ProductCarousel({
           {products.map((p) => (
             <div
               key={p._id}
-              className="snap-start w-[min(72vw,250px)] shrink-0 sm:w-[270px]"
+              className="snap-start w-[min(58vw,200px)] shrink-0 sm:w-[270px]"
             >
               <ProductCard product={p} />
             </div>

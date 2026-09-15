@@ -34,8 +34,9 @@ export default async function AdminDashboard() {
           : "Mongo not ready. Set MONGODB_URI and USE_MEMORY_CATALOG=false, then seed."}
       </p>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
+          { label: "Hero slides", value: "Edit", href: "/admin/hero" },
           { label: "Products", value: counts.products, href: "/admin/products" },
           { label: "Reels", value: counts.reels, href: "/admin/reels" },
           {
@@ -58,6 +59,9 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="mt-8 flex flex-wrap gap-3">
+        <Link href="/admin/hero" className="btn-accent px-6 py-3 text-sm">
+          Edit hero images
+        </Link>
         <Link href="/admin/products/new" className="btn-accent px-6 py-3 text-sm">
           Add product
         </Link>
