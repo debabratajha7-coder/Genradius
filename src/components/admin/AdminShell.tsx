@@ -16,6 +16,7 @@ const GROUPS: {
     title: "Storefront",
     links: [
       { href: "/admin/hero", label: "Hero" },
+      { href: "/admin/home", label: "About & Circles" },
       { href: "/admin/promos", label: "Promos" },
     ],
   },

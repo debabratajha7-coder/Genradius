@@ -71,11 +71,11 @@ export function TopCategories({ categories }: { categories: CategoryLean[] }) {
 
   return (
     <section className="mx-auto max-w-[1400px] px-3 py-4 sm:px-6 sm:py-8">
-      <div className="mb-3 flex items-center justify-between gap-3 sm:mb-6">
-        <h2 className="section-title mb-0 flex-1 text-left">Top Categories</h2>
+      <div className="section-heading">
+        <h2 className="section-title">Top Categories</h2>
         <Link
           href="/shop"
-          className="shrink-0 self-center text-[10px] font-extrabold tracking-wider text-[var(--moss)] uppercase underline-offset-2 hover:underline sm:text-xs"
+          className="shrink-0 pb-1 text-[10px] font-extrabold tracking-wider text-[var(--moss)] uppercase underline-offset-2 hover:underline sm:text-xs"
         >
           Explore all
         </Link>

@@ -3,7 +3,9 @@ export function FeaturedOn() {
 
   return (
     <section className="mx-auto max-w-[1400px] px-3 py-6 sm:px-6 sm:py-12">
-      <h2 className="section-title mb-4 sm:mb-8">Genradius Featured On</h2>
+      <div className="section-heading section-heading--solo">
+        <h2 className="section-title">Genradius Featured On</h2>
+      </div>
       <div className="flex gap-6 overflow-x-auto pb-1 scrollbar-none sm:flex-wrap sm:items-center sm:justify-center sm:gap-14">
         {logos.map((name) => (
           <span

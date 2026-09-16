@@ -42,6 +42,7 @@ export default async function AdminDashboard() {
       title: "Storefront",
       cards: [
         { label: "Hero slides", value: counts.hero, href: "/admin/hero" },
+        { label: "About & Circles", value: "Edit", href: "/admin/home" },
         { label: "Promos", value: counts.promos, href: "/admin/promos" },
       ],
     },

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminGate } from "@/components/admin/AdminGate";
-import { ProductForm, productToFormValues } from "@/components/admin/ProductForm";
+import { ProductForm } from "@/components/admin/ProductForm";
 import { connectDB, useMemoryCatalog } from "@/lib/db";
+import { productToFormValues } from "@/lib/product-form";
 import { getCategories } from "@/lib/products";
 import Product from "@/models/Product";
 

@@ -54,6 +54,7 @@ export async function POST(req: Request) {
       embedUrl: parsed.embedUrl,
       shortcode: parsed.shortcode,
       thumbnailUrl: String(body.thumbnailUrl || ""),
+      videoUrl: String(body.videoUrl || ""),
       productSlug: String(body.productSlug || ""),
       active: body.active !== false,
       order: Number(body.order) || 0,

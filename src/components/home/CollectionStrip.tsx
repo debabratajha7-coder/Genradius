@@ -1,52 +1,64 @@
+import Image from "next/image";
 import Link from "next/link";
+import type { CollectionTileLean } from "@/lib/home-media-defaults";
+import { DEFAULT_COLLECTIONS } from "@/lib/home-media-defaults";
 
-const DROPS = [
-  {
-    name: "Orbit",
-    href: "/shop?collection=orbit",
-    bg: "from-[#be9c7d] to-[#878c64]",
-    label: "ORBIT",
-  },
-  {
-    name: "Premium",
-    href: "/shop?collection=premium",
-    bg: "from-[#535539] to-[#2a291e]",
-    label: "PREMIUM",
-  },
-  {
-    name: "Sale",
-    href: "/shop/sale",
-    bg: "from-[#88986b] to-[#443f20]",
-    label: "SALE",
-  },
-  {
-    name: "Cargos",
-    href: "/shop/cargos",
-    bg: "from-[#cbcfd0] to-[#535539]",
-    label: "CARGOS",
-  },
-];
+function TileFace({
+  tile,
+  aspect,
+  labelClass,
+}: {
+  tile: CollectionTileLean;
+  aspect: string;
+  labelClass: string;
+}) {
+  return (
+    <div
+      className={`relative flex ${aspect} items-end overflow-hidden bg-gradient-to-br ${tile.bg} p-2.5 transition group-hover:brightness-110 sm:p-4`}
+    >
+      {tile.image ? (
+        <Image
+          src={tile.image}
+          alt={tile.label}
+          fill
+          className="object-cover"
+          sizes="(max-width: 1023px) 50vw, 25vw"
+        />
+      ) : null}
+      <span
+        className={`relative z-10 rounded-md bg-white/95 font-extrabold tracking-wide uppercase shadow-sm ${labelClass}`}
+      >
+        {tile.label}
+      </span>
+    </div>
+  );
+}
 
-export function CollectionStrip() {
+export function CollectionStrip({
+  tiles = DEFAULT_COLLECTIONS,
+}: {
+  tiles?: CollectionTileLean[];
+}) {
+  const drops = tiles.length ? tiles : DEFAULT_COLLECTIONS;
+
   return (
     <section className="mx-auto max-w-[1400px] px-3 py-7 sm:px-6 sm:py-12">
-      <h2 className="section-title mb-4 sm:mb-8">Circle Assemble!</h2>
+      <div className="section-heading section-heading--solo">
+        <h2 className="section-title">Circle Assemble!</h2>
+      </div>
 
-      {/* Phone: compact 2×2 */}
       <div className="grid grid-cols-2 gap-2.5 lg:hidden">
-        {DROPS.map((d) => (
+        {drops.map((d) => (
           <Link
-            key={d.name}
+            key={d.key}
             href={d.href}
             className="group relative overflow-hidden rounded-2xl"
           >
-            <div
-              className={`flex aspect-[5/4] items-end bg-gradient-to-br ${d.bg} p-2.5`}
-            >
-              <span className="rounded-md bg-white/95 px-2 py-1 text-[10px] font-extrabold tracking-wide uppercase shadow-sm">
-                {d.label}
-              </span>
-            </div>
+            <TileFace
+              tile={d}
+              aspect="aspect-[5/4]"
+              labelClass="px-2 py-1 text-[10px]"
+            />
           </Link>
         ))}
       </div>
@@ -60,21 +72,18 @@ export function CollectionStrip() {
         </Link>
       </div>
 
-      {/* Desktop */}
       <div className="hidden grid-cols-4 gap-5 lg:grid">
-        {DROPS.map((d) => (
+        {drops.map((d) => (
           <Link
-            key={d.name}
+            key={d.key}
             href={d.href}
             className="shadow-[4px_4px_0_#2a291e] group relative overflow-hidden rounded-2xl"
           >
-            <div
-              className={`flex aspect-[3/4] items-end bg-gradient-to-br ${d.bg} p-4 transition group-hover:brightness-110`}
-            >
-              <span className="rounded-lg bg-white px-3 py-2 text-sm font-extrabold tracking-wide uppercase">
-                {d.label}
-              </span>
-            </div>
+            <TileFace
+              tile={d}
+              aspect="aspect-[3/4]"
+              labelClass="rounded-lg px-3 py-2 text-sm"
+            />
           </Link>
         ))}
       </div>

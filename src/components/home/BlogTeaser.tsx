@@ -25,7 +25,9 @@ const BLOGS = [
 export function BlogTeaser() {
   return (
     <section id="blogs" className="mx-auto max-w-[1400px] px-3 py-7 sm:px-6 sm:py-10">
-      <h2 className="section-title mb-4 sm:mb-8">Explore More Blogs</h2>
+      <div className="section-heading section-heading--solo">
+        <h2 className="section-title">Explore More Blogs</h2>
+      </div>
 
       {/* Phone: horizontal snap cards */}
       <div className="snap-x-mandatory flex gap-3 overflow-x-auto pb-2 scrollbar-none lg:hidden">

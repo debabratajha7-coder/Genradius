@@ -2,9 +2,49 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { ProductLean, ReelLean } from "@/types/catalog";
 import { formatINR, discountPercent } from "@/lib/format";
+import { slugify } from "@/lib/slug";
+
+function LoopingReelVideo({
+  src,
+  poster,
+  title,
+}: {
+  src: string;
+  poster?: string;
+  title: string;
+}) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.muted = true;
+    const play = () => {
+      void el.play().catch(() => {});
+    };
+    play();
+    el.addEventListener("canplay", play);
+    return () => el.removeEventListener("canplay", play);
+  }, [src]);
+
+  return (
+    <video
+      ref={ref}
+      src={src}
+      poster={poster || undefined}
+      className="absolute inset-0 h-full w-full object-cover"
+      muted
+      loop
+      playsInline
+      autoPlay
+      preload="metadata"
+      aria-label={title}
+    />
+  );
+}
 
 export function WatchAndBuy({
   products,
@@ -38,8 +78,10 @@ export function WatchAndBuy({
       />
 
       <div className="relative mx-auto max-w-[1400px] px-4 sm:px-6">
-        <h2 className="section-title mb-3">Watch and Buy</h2>
-        <p className="mb-8 text-center text-sm font-medium text-[var(--moss)]">
+        <div className="section-heading section-heading--solo mb-2 sm:mb-3">
+          <h2 className="section-title">Watch and Buy</h2>
+        </div>
+        <p className="mb-8 text-left text-sm font-medium text-[var(--moss)] lg:text-center">
           {hasReels
             ? "Instagram drops from the Genradius circle."
             : "Tap a frame — same size cards, deeper stage."}
@@ -79,10 +121,12 @@ export function WatchAndBuy({
           >
             {hasReels
               ? reels.map((r) => {
-                  const href = r.productSlug
-                    ? `/product/${r.productSlug}`
-                    : r.instagramUrl;
+                  const productPath = r.productSlug
+                    ? `/product/${slugify(r.productSlug) || r.productSlug.trim()}`
+                    : "";
+                  const href = productPath || r.instagramUrl;
                   const external = !r.productSlug;
+                  const hasVideo = Boolean(r.videoUrl);
                   return (
                     <Link
                       key={r._id}
@@ -101,7 +145,13 @@ export function WatchAndBuy({
                       />
                       <article className="relative flex h-full flex-col overflow-hidden rounded-xl border-2 border-[var(--ink)] bg-[var(--background)] shadow-[4px_4px_0_0_var(--ink)] transition group-hover:-translate-y-1 group-hover:shadow-[6px_6px_0_0_var(--ink)]">
                         <div className="relative aspect-[3/4] overflow-hidden bg-[#b9e0f7]">
-                          {r.thumbnailUrl ? (
+                          {hasVideo ? (
+                            <LoopingReelVideo
+                              src={r.videoUrl}
+                              poster={r.thumbnailUrl || undefined}
+                              title={r.title}
+                            />
+                          ) : r.thumbnailUrl ? (
                             <Image
                               src={r.thumbnailUrl}
                               alt={r.title}
@@ -116,18 +166,24 @@ export function WatchAndBuy({
                               </span>
                             </div>
                           )}
-                          <span className="absolute inset-0 flex items-center justify-center">
-                            <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--ink)] bg-[var(--sand)] shadow-[3px_3px_0_0_var(--ink)]">
-                              ▶
+                          {!hasVideo && (
+                            <span className="absolute inset-0 flex items-center justify-center">
+                              <span className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--ink)] bg-[var(--sand)] shadow-[3px_3px_0_0_var(--ink)]">
+                                ▶
+                              </span>
                             </span>
-                          </span>
+                          )}
                         </div>
                         <div className="border-t-2 border-[var(--ink)] p-3">
                           <p className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-snug">
                             {r.title}
                           </p>
                           <p className="mt-1 text-[10px] font-bold tracking-wider text-[var(--moss)] uppercase">
-                            Watch on Instagram
+                            {r.productSlug
+                              ? "Shop the look"
+                              : hasVideo
+                                ? "Open on Instagram"
+                                : "Watch on Instagram"}
                           </p>
                         </div>
                       </article>

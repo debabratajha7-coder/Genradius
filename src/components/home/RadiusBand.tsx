@@ -1,7 +1,28 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { HomeMediaLean } from "@/lib/home-media-defaults";
+import { DEFAULT_HOME_MEDIA } from "@/lib/home-media-defaults";
 
-export function RadiusBand() {
+export function RadiusBand({
+  media = DEFAULT_HOME_MEDIA,
+}: {
+  media?: HomeMediaLean;
+}) {
+  const collage = [
+    {
+      src: media.aboutCollage[0],
+      className: "absolute top-0 left-4 w-44 rotate-[-8deg]",
+    },
+    {
+      src: media.aboutCollage[1],
+      className: "absolute top-4 right-2 w-44 rotate-[6deg]",
+    },
+    {
+      src: media.aboutCollage[2],
+      className: "absolute bottom-0 left-1/4 w-48 rotate-[3deg]",
+    },
+  ];
+
   return (
     <section id="about" className="relative overflow-hidden">
       {/* Phone: single inset promo banner */}
@@ -12,7 +33,7 @@ export function RadiusBand() {
         >
           <div className="relative aspect-[16/9] min-h-[140px]">
             <Image
-              src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900&q=80"
+              src={media.aboutPhoneBanner}
               alt="The Radius"
               fill
               className="object-cover"
@@ -81,18 +102,33 @@ export function RadiusBand() {
                     <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
                   </div>
                   <div className="relative aspect-[4/5]">
-                    <Image
-                      src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900&q=80"
-                      alt="Genradius crew"
-                      fill
-                      className="object-cover"
-                      sizes="400px"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[var(--ink)] bg-[var(--sand)] text-xl font-bold shadow-[2px_2px_0_0_var(--ink)]">
-                        ▶
-                      </span>
-                    </div>
+                    {media.aboutVideoUrl ? (
+                      <video
+                        src={media.aboutVideoUrl}
+                        poster={media.aboutVideoPoster}
+                        className="absolute inset-0 h-full w-full object-cover"
+                        muted
+                        loop
+                        playsInline
+                        autoPlay
+                        preload="metadata"
+                      />
+                    ) : (
+                      <>
+                        <Image
+                          src={media.aboutVideoPoster}
+                          alt="Genradius crew"
+                          fill
+                          className="object-cover"
+                          sizes="400px"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[var(--ink)] bg-[var(--sand)] text-xl font-bold shadow-[2px_2px_0_0_var(--ink)]">
+                            ▶
+                          </span>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -134,22 +170,9 @@ export function RadiusBand() {
             </div>
 
             <div className="relative mx-auto h-72 w-full max-w-lg">
-              {[
-                {
-                  src: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80",
-                  className: "absolute top-0 left-4 w-44 rotate-[-8deg]",
-                },
-                {
-                  src: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&q=80",
-                  className: "absolute top-4 right-2 w-44 rotate-[6deg]",
-                },
-                {
-                  src: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=500&q=80",
-                  className: "absolute bottom-0 left-1/4 w-48 rotate-[3deg]",
-                },
-              ].map((img) => (
+              {collage.map((img) => (
                 <div
-                  key={img.src}
+                  key={img.src + img.className}
                   className={`relative ${img.className} aspect-[3/4] overflow-hidden rounded-xl border-2 border-white shadow-lg`}
                 >
                   <Image

@@ -19,6 +19,7 @@ export async function getActiveReels(limit = 12): Promise<ReelLean[]> {
       embedUrl: r.embedUrl,
       shortcode: r.shortcode,
       thumbnailUrl: r.thumbnailUrl ?? "",
+      videoUrl: r.videoUrl ?? "",
       productSlug: r.productSlug ?? "",
       active: Boolean(r.active),
       order: r.order ?? 0,

@@ -9,6 +9,7 @@ export default async function AdminReelsPage() {
     title: string;
     instagramUrl: string;
     thumbnailUrl?: string;
+    videoUrl?: string;
     productSlug?: string;
     active?: boolean;
     order?: number;
@@ -22,6 +23,7 @@ export default async function AdminReelsPage() {
       title: r.title,
       instagramUrl: r.instagramUrl,
       thumbnailUrl: r.thumbnailUrl,
+      videoUrl: r.videoUrl,
       productSlug: r.productSlug,
       active: r.active,
       order: r.order,
@@ -34,8 +36,8 @@ export default async function AdminReelsPage() {
         Instagram reels
       </h1>
       <p className="mt-2 max-w-2xl text-sm text-[var(--moss)]">
-        Paste a reel link from Instagram. It shows in Watch &amp; Buy on the
-        storefront (with optional Cloudinary thumbnail + product link).
+        Upload an MP4 to autoplay on Watch &amp; Buy. Instagram URL is the
+        fallback tap target (and optional product link).
       </p>
       <div className="mt-6">
         <ReelsManager initial={reels} />

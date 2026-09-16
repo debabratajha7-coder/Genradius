@@ -46,13 +46,22 @@ export async function PUT(req: Request, ctx: Ctx) {
     }
     if (body.thumbnailUrl != null)
       update.thumbnailUrl = String(body.thumbnailUrl);
+    if (body.videoUrl != null) update.videoUrl = String(body.videoUrl);
     if (body.productSlug != null) update.productSlug = String(body.productSlug);
     if (body.active != null) update.active = Boolean(body.active);
     if (body.order != null) update.order = Number(body.order);
 
-    const row = await Reel.findByIdAndUpdate(id, update, { new: true }).lean();
+    const row = await Reel.findByIdAndUpdate(
+      id,
+      { $set: update },
+      { new: true, runValidators: true },
+    ).lean();
     if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    return NextResponse.json(row);
+    return NextResponse.json({
+      ...row,
+      _id: String(row._id),
+      videoUrl: row.videoUrl ?? "",
+    });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Update failed";
     return NextResponse.json({ error: message }, { status: 500 });

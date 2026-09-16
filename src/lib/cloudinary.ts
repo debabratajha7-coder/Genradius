@@ -45,6 +45,30 @@ export async function uploadImageBuffer(
   });
 }
 
+export async function uploadVideoBuffer(
+  buffer: Buffer,
+  folder = "genradius/reels",
+): Promise<{ url: string; publicId: string }> {
+  const cld = configureCloudinary();
+
+  return new Promise((resolve, reject) => {
+    const stream = cld.uploader.upload_stream(
+      {
+        folder,
+        resource_type: "video",
+      },
+      (err, result) => {
+        if (err || !result) {
+          reject(err ?? new Error("Cloudinary video upload failed"));
+          return;
+        }
+        resolve({ url: result.secure_url, publicId: result.public_id });
+      },
+    );
+    stream.end(buffer);
+  });
+}
+
 export function isCloudinaryConfigured(): boolean {
   return Boolean(
     process.env.CLOUDINARY_CLOUD_NAME &&

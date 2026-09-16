@@ -35,14 +35,18 @@ export function ProductCarousel({
   return (
     <section className="mx-auto max-w-[1400px] px-3 py-6 sm:px-6 sm:py-14">
       <Reveal>
-        <div className="mb-4 flex items-center justify-between gap-3 sm:mb-10">
-          <h2 className="section-title mb-0 flex-1 text-left lg:flex-none lg:w-full lg:text-center">
-            {title}
-          </h2>
+        <div
+          className={
+            ctaLabel && ctaHref
+              ? "section-heading section-heading--center"
+              : "section-heading section-heading--solo"
+          }
+        >
+          <h2 className="section-title">{title}</h2>
           {ctaLabel && ctaHref ? (
             <Link
               href={ctaHref}
-              className="shrink-0 self-center text-[10px] font-extrabold tracking-wider text-[var(--moss)] uppercase underline-offset-2 hover:underline lg:hidden"
+              className="shrink-0 pb-1 text-[10px] font-extrabold tracking-wider text-[var(--moss)] uppercase underline-offset-2 hover:underline lg:hidden"
             >
               View all
             </Link>

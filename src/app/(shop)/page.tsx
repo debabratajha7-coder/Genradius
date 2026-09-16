@@ -11,6 +11,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { getCategories, getProducts } from "@/lib/products";
 import { getActiveReels } from "@/lib/reels";
 import { getHeroSlides } from "@/lib/hero";
+import { getHomeMedia } from "@/lib/home-media";
 
 export default async function HomePage() {
   const [
@@ -21,6 +22,7 @@ export default async function HomePage() {
     watch,
     reels,
     heroSlides,
+    homeMedia,
   ] = await Promise.all([
     getCategories(),
     getProducts({ featured: true, limit: 12 }),
@@ -29,6 +31,7 @@ export default async function HomePage() {
     getProducts({ collection: "watch-buy", limit: 10 }),
     getActiveReels(12),
     getHeroSlides(),
+    getHomeMedia(),
   ]);
 
   return (
@@ -59,10 +62,10 @@ export default async function HomePage() {
         ctaHref="/shop?collection=radius-range"
       />
       <Reveal>
-        <CollectionStrip />
+        <CollectionStrip tiles={homeMedia.collections} />
       </Reveal>
       <Reveal y={48}>
-        <RadiusBand />
+        <RadiusBand media={homeMedia} />
       </Reveal>
       <Reveal>
         <TrustRow />

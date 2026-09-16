@@ -40,6 +40,7 @@ export type ReelLean = {
   embedUrl: string;
   shortcode: string;
   thumbnailUrl: string;
+  videoUrl: string;
   productSlug: string;
   active: boolean;
   order: number;
