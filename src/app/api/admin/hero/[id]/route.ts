@@ -6,7 +6,7 @@ import { deleteHeroSlide, updateHeroSlide } from "@/lib/hero";
 type Ctx = { params: Promise<{ id: string }> };
 
 export async function PATCH(req: Request, ctx: Ctx) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("hero");
   if (denied) return denied;
 
   try {
@@ -36,7 +36,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
 }
 
 export async function DELETE(_req: Request, ctx: Ctx) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("hero");
   if (denied) return denied;
 
   try {

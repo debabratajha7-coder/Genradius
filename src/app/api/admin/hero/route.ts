@@ -7,7 +7,7 @@ import {
 } from "@/lib/hero";
 
 export async function GET() {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("hero");
   if (denied) return denied;
 
   try {
@@ -20,7 +20,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("hero");
   if (denied) return denied;
 
   try {

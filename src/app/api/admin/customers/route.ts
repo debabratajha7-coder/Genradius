@@ -4,7 +4,7 @@ import { connectDB, useMemoryCatalog } from "@/lib/db";
 import User from "@/models/User";
 
 export async function GET(req: Request) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("customers");
   if (denied) return denied;
 
   if (useMemoryCatalog()) {

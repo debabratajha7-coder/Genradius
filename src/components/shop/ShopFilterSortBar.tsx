@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import type { CategoryLean, ProductLean } from "@/types/catalog";
 import { ProductCard } from "@/components/product/ProductCard";
+import { ComingSoonPopup } from "@/components/ui/ComingSoonPopup";
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "newest";
 
@@ -87,9 +88,10 @@ export function ShopListingClient({
       </div>
 
       {sorted.length === 0 && (
-        <p className="py-20 text-center text-[var(--muted)]">
-          No styles found — try another filter.
-        </p>
+        <>
+          <ComingSoonPopup label={title} />
+          <ComingSoonPopup variant="modal" label={title} />
+        </>
       )}
 
       {/* Phone sticky Filters | Sort */}

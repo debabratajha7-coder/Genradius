@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { normalizePhone } from "@/lib/phone";
 import { checkPhoneOtp } from "@/lib/twilio";
 import { createUserSession } from "@/lib/user-auth";
@@ -6,6 +7,19 @@ import { isProfileComplete, upsertPhoneUser } from "@/lib/users";
 
 export async function POST(req: Request) {
   try {
+    const ip = clientIp(req);
+    const limited = rateLimit({
+      key: `otp:verify:${ip}`,
+      limit: 20,
+      windowMs: 15 * 60 * 1000,
+    });
+    if (!limited.ok) {
+      return NextResponse.json(
+        { error: `Too many attempts. Try again in ${limited.retryAfterSec}s.` },
+        { status: 429 },
+      );
+    }
+
     const body = (await req.json()) as { phone?: string; code?: string };
     const phone = normalizePhone(String(body.phone || ""));
     const code = String(body.code || "");

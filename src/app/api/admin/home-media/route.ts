@@ -18,7 +18,7 @@ function mongoRequired() {
 }
 
 export async function GET() {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("home");
   if (denied) return denied;
   const mem = mongoRequired();
   if (mem) return mem;
@@ -33,7 +33,7 @@ export async function GET() {
 }
 
 export async function PUT(req: Request) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("home");
   if (denied) return denied;
   const mem = mongoRequired();
   if (mem) return mem;

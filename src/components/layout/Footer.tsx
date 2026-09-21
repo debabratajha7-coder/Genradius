@@ -5,16 +5,35 @@ import { useState, type FormEvent } from "react";
 
 export function Footer() {
   const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-  const onSubscribe = (e: FormEvent) => {
+  const onSubscribe = async (e: FormEvent) => {
     e.preventDefault();
-    setEmail("");
+    setBusy(true);
+    setError("");
+    setMessage("");
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not join");
+      setEmail("");
+      setMessage("You're in the circle — drops land here first.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not join");
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
     <footer className="mt-auto border-t border-[var(--ink)]/20 bg-[var(--earth)] text-[var(--silver)] pb-[calc(var(--app-tabbar-h)+env(safe-area-inset-bottom)+0.75rem)] lg:pb-6">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-12">
-        {/* Signup — stacked on phone, row on large */}
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
           <div className="max-w-md">
             <p className="text-[10px] font-extrabold tracking-[0.2em] text-[var(--sand)] uppercase">
@@ -28,28 +47,39 @@ export function Footer() {
             </p>
           </div>
 
-          <form
-            onSubmit={onSubscribe}
-            className="flex w-full max-w-md overflow-hidden rounded-md border-2 border-[var(--ink)] bg-[var(--background)] shadow-[3px_3px_0_0_var(--ink)]"
-          >
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              className="min-w-0 flex-1 bg-transparent px-3 py-3 text-sm text-[var(--ink)] outline-none sm:px-4"
-            />
-            <button
-              type="submit"
-              className="shrink-0 border-l-2 border-[var(--ink)] bg-[var(--sand)] px-4 py-3 text-[10px] font-extrabold tracking-widest text-[var(--ink)] uppercase sm:px-5 sm:text-xs"
+          <div className="w-full max-w-md">
+            <form
+              onSubmit={onSubscribe}
+              className="flex overflow-hidden rounded-md border-2 border-[var(--ink)] bg-[var(--background)] shadow-[3px_3px_0_0_var(--ink)]"
             >
-              Join
-            </button>
-          </form>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                disabled={busy}
+                className="min-w-0 flex-1 bg-transparent px-3 py-3 text-sm text-[var(--ink)] outline-none sm:px-4"
+              />
+              <button
+                type="submit"
+                disabled={busy}
+                className="shrink-0 border-l-2 border-[var(--ink)] bg-[var(--sand)] px-4 py-3 text-[10px] font-extrabold tracking-widest text-[var(--ink)] uppercase sm:px-5 sm:text-xs"
+              >
+                {busy ? "…" : "Join"}
+              </button>
+            </form>
+            {message && (
+              <p className="mt-2 text-xs font-semibold text-[var(--sand)]">
+                {message}
+              </p>
+            )}
+            {error && (
+              <p className="mt-2 text-xs font-semibold text-red-300">{error}</p>
+            )}
+          </div>
         </div>
 
-        {/* Link columns — 2 on phone, 4 on large */}
         <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 border-t border-[var(--sand)]/25 pt-8 lg:mt-10 lg:grid-cols-4 lg:gap-8">
           <div>
             <h3 className="mb-3 text-[10px] font-extrabold tracking-[0.16em] text-[var(--sand)] uppercase">

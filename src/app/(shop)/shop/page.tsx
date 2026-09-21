@@ -4,6 +4,14 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Shop All",
+  description:
+    "Browse Genradius men's streetwear — oversized tees, cargos, polos, and more.",
+  alternates: { canonical: "/shop" },
+  openGraph: {
+    title: "Shop All | Genradius",
+    description:
+      "Browse Genradius men's streetwear — oversized tees, cargos, polos, and more.",
+  },
 };
 
 type Props = {

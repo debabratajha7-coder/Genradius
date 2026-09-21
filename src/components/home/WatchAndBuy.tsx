@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react";
 import type { ProductLean, ReelLean } from "@/types/catalog";
 import { formatINR, discountPercent } from "@/lib/format";
 import { slugify } from "@/lib/slug";
+import { ComingSoonPopup } from "@/components/ui/ComingSoonPopup";
 
 function LoopingReelVideo({
   src,
@@ -56,8 +57,7 @@ export function WatchAndBuy({
   const scroller = useRef<HTMLDivElement>(null);
   const productFallback = products.slice(0, 8);
   const hasReels = reels.length > 0;
-
-  if (!hasReels && !productFallback.length) return null;
+  const empty = !hasReels && !productFallback.length;
 
   return (
     <section className="relative my-4 overflow-hidden py-10 sm:my-6 sm:py-16">
@@ -82,11 +82,16 @@ export function WatchAndBuy({
           <h2 className="section-title">Watch and Buy</h2>
         </div>
         <p className="mb-8 text-left text-sm font-medium text-[var(--moss)] lg:text-center">
-          {hasReels
-            ? "Instagram drops from the Genradius circle."
-            : "Tap a frame — same size cards, deeper stage."}
+          {empty
+            ? "Reels and looks for this stage are on the way."
+            : hasReels
+              ? "Instagram drops from the Genradius circle."
+              : "Tap a frame — same size cards, deeper stage."}
         </p>
 
+        {empty ? (
+          <ComingSoonPopup label="Watch and Buy" />
+        ) : (
         <div className="relative rounded-2xl border-2 border-[var(--ink)] bg-white/35 p-3 shadow-[6px_6px_0_0_rgba(42,41,30,0.15)] backdrop-blur-sm sm:p-6 sm:shadow-[8px_8px_0_0_rgba(42,41,30,0.15)]">
           <div
             className="pointer-events-none absolute inset-x-6 bottom-3 h-8 rounded-[100%] bg-[var(--ink)]/10 blur-md"
@@ -236,6 +241,7 @@ export function WatchAndBuy({
                 })}
           </div>
         </div>
+        )}
       </div>
     </section>
   );

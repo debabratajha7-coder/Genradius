@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { consumeEmailVerification } from "@/lib/email-otp";
 import { hashPassword, normalizeEmail } from "@/lib/password";
+import { addSubscriber } from "@/lib/subscribers";
 import { createUserSession, getUserSession } from "@/lib/user-auth";
 import { completePhoneProfile } from "@/lib/users";
 
@@ -30,6 +32,16 @@ export async function POST(req: Request) {
       );
     }
 
+    if (!consumeEmailVerification(session.userId, email)) {
+      return NextResponse.json(
+        {
+          error:
+            "Verify your email with the OTP we sent before finishing signup.",
+        },
+        { status: 403 },
+      );
+    }
+
     const passwordHash = await hashPassword(password);
     const result = await completePhoneProfile({
       userId: session.userId,
@@ -44,6 +56,8 @@ export async function POST(req: Request) {
         { status: result.status },
       );
     }
+
+    await addSubscriber(email, "footer");
 
     await createUserSession({
       userId: result.user.id,

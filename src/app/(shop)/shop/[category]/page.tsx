@@ -15,8 +15,11 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
   const cat = await getCategoryBySlug(category);
+  const title = cat?.name ?? "Shop";
   return {
-    title: cat?.name ?? "Shop",
+    title,
+    description: `Shop ${title} at Genradius — men's streetwear that owns its radius.`,
+    alternates: { canonical: `/shop/${encodeURIComponent(category)}` },
   };
 }
 

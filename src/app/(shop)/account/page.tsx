@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { DeleteAccountPanel } from "@/components/auth/DeleteAccountPanel";
 import { useCart } from "@/components/cart/CartProvider";
 import { FadeIn } from "@/components/motion/Reveal";
 import { formatINR } from "@/lib/format";
@@ -461,6 +462,8 @@ export default function AccountPage() {
           </button>
         </div>
       </section>
+
+      <DeleteAccountPanel />
     </FadeIn>
   );
 }

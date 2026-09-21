@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { requireAdminApi } from "@/lib/admin-auth";
+import {
+  adminHasPermission,
+  getAdminSession,
+  requireAdminApi,
+} from "@/lib/admin-auth";
 import {
   isCloudinaryConfigured,
   uploadImageBuffer,
@@ -11,9 +15,22 @@ export const runtime = "nodejs";
 const MAX_IMAGE_BYTES = 12 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 80 * 1024 * 1024;
 
+const UPLOAD_PERMS = ["products", "hero", "home", "reels", "categories"] as const;
+
 export async function POST(req: Request) {
   const denied = await requireAdminApi();
   if (denied) return denied;
+
+  const session = await getAdminSession();
+  if (
+    !session ||
+    !UPLOAD_PERMS.some((p) => adminHasPermission(session, p))
+  ) {
+    return NextResponse.json(
+      { error: "You don’t have permission to upload media" },
+      { status: 403 },
+    );
+  }
 
   if (!isCloudinaryConfigured()) {
     return NextResponse.json(

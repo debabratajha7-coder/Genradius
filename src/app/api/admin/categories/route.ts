@@ -19,7 +19,7 @@ function mongoRequired() {
 }
 
 export async function GET() {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("categories");
   if (denied) return denied;
   const mem = mongoRequired();
   if (mem) return mem;
@@ -30,7 +30,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("categories");
   if (denied) return denied;
   const mem = mongoRequired();
   if (mem) return mem;
@@ -58,7 +58,7 @@ export async function POST(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("categories");
   if (denied) return denied;
   const mem = mongoRequired();
   if (mem) return mem;
@@ -105,7 +105,7 @@ export async function PATCH(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("categories");
   if (denied) return denied;
   const mem = mongoRequired();
   if (mem) return mem;

@@ -320,3 +320,44 @@ export async function touchLogin(userId: string) {
   await connectDB();
   await User.findByIdAndUpdate(userId, { lastLoginAt: new Date() });
 }
+
+/** Permanently remove a member account (PII). */
+export async function deleteUserAccount(
+  userId: string,
+): Promise<{ ok: true; email?: string } | { ok: false; error: string }> {
+  if (useMemoryCatalog()) {
+    const store = memoryStore();
+    let found: MemoryUser | undefined;
+    for (const [key, u] of store.entries()) {
+      if (u.id === userId) {
+        found = u;
+        store.delete(key);
+      }
+    }
+    if (!found) return { ok: false, error: "Account not found" };
+    return { ok: true, email: found.email };
+  }
+
+  await connectDB();
+  const user = await User.findByIdAndDelete(userId);
+  if (!user) return { ok: false, error: "Account not found" };
+  return { ok: true, email: user.email || undefined };
+}
+
+/** Emails of accounts that have completed / shared an email */
+export async function listMemberEmails(): Promise<string[]> {
+  if (useMemoryCatalog()) {
+    const emails = new Set<string>();
+    for (const u of memoryStore().values()) {
+      if (u.email) emails.add(u.email.toLowerCase());
+    }
+    return [...emails];
+  }
+  await connectDB();
+  const users = await User.find({ email: { $exists: true, $ne: "" } })
+    .select("email")
+    .lean();
+  return users
+    .map((u) => String(u.email || "").toLowerCase())
+    .filter(Boolean);
+}

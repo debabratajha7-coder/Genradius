@@ -5,6 +5,7 @@ import { useRef } from "react";
 import type { ProductLean } from "@/types/catalog";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Reveal } from "@/components/motion/Reveal";
+import { ComingSoonPopup } from "@/components/ui/ComingSoonPopup";
 
 export function ProductCarousel({
   title,
@@ -22,6 +23,7 @@ export function ProductCarousel({
 }) {
   const scroller = useRef<HTMLDivElement>(null);
   const phoneProducts = products.slice(0, phoneLimit);
+  const empty = products.length === 0;
 
   const scroll = (dir: -1 | 1) => {
     scroller.current?.scrollBy({
@@ -30,20 +32,18 @@ export function ProductCarousel({
     });
   };
 
-  if (!products.length) return null;
-
   return (
     <section className="mx-auto max-w-[1400px] px-3 py-6 sm:px-6 sm:py-14">
       <Reveal>
         <div
           className={
-            ctaLabel && ctaHref
+            !empty && ctaLabel && ctaHref
               ? "section-heading section-heading--center"
               : "section-heading section-heading--solo"
           }
         >
           <h2 className="section-title">{title}</h2>
-          {ctaLabel && ctaHref ? (
+          {!empty && ctaLabel && ctaHref ? (
             <Link
               href={ctaHref}
               className="shrink-0 pb-1 text-[10px] font-extrabold tracking-wider text-[var(--moss)] uppercase underline-offset-2 hover:underline lg:hidden"
@@ -54,14 +54,19 @@ export function ProductCarousel({
         </div>
       </Reveal>
 
+      {empty ? <ComingSoonPopup label={title} /> : null}
+
       {/* Phone: 2-col commerce grid */}
+      {!empty ? (
       <div className="app-product-grid grid grid-cols-2 gap-2.5 lg:hidden">
         {phoneProducts.map((p) => (
           <ProductCard key={p._id} product={p} />
         ))}
       </div>
+      ) : null}
 
       {/* Desktop / tablet: horizontal carousel */}
+      {!empty ? (
       <div className="relative hidden lg:block">
         <button
           type="button"
@@ -91,8 +96,9 @@ export function ProductCarousel({
           ))}
         </div>
       </div>
+      ) : null}
 
-      {ctaLabel && ctaHref && (
+      {!empty && ctaLabel && ctaHref && (
         <Reveal delay={0.1}>
           <div className="mt-6 hidden justify-center sm:mt-10 lg:flex">
             <Link

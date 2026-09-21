@@ -62,6 +62,8 @@ export default async function AdminDashboard() {
           value: counts.customers,
           href: "/admin/customers",
         },
+        { label: "Email drops", value: "Send", href: "/admin/notify" },
+        { label: "Admin team", value: "Users", href: "/admin/team" },
         { label: "Orders", value: "Soon", href: "/admin/orders" },
       ],
     },

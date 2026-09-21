@@ -17,7 +17,7 @@ function mongoRequired() {
 }
 
 export async function GET() {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("promos");
   if (denied) return denied;
   const mem = mongoRequired();
   if (mem) return mem;
@@ -28,7 +28,7 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("promos");
   if (denied) return denied;
   const mem = mongoRequired();
   if (mem) return mem;
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("promos");
   if (denied) return denied;
   const mem = mongoRequired();
   if (mem) return mem;

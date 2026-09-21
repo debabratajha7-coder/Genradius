@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCart } from "./CartProvider";
 import { formatINR } from "@/lib/format";
@@ -108,6 +109,8 @@ function CartBody({
   subtotal: number;
   sheet?: boolean;
 }) {
+  const router = useRouter();
+
   if (items.length === 0) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 py-12 text-center">
@@ -203,11 +206,19 @@ function CartBody({
           <span className="font-bold">{formatINR(subtotal)}</span>
         </div>
         <p className="mb-3 text-xs text-[var(--muted)]">
-          Shipping & taxes calculated at checkout. (Checkout coming soon.)
+          Shipping is quoted at checkout via Shiprocket. Pay with PhonePe.
         </p>
-        <button type="button" className="btn-accent w-full py-3.5 text-sm">
+        <Link
+          href="/checkout"
+          onClick={(event) => {
+            event.preventDefault();
+            closeCart();
+            router.push("/checkout");
+          }}
+          className="btn-accent w-full py-3.5 text-sm"
+        >
           Checkout / {formatINR(subtotal)}
-        </button>
+        </Link>
       </div>
     </>
   );

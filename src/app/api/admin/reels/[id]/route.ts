@@ -20,7 +20,7 @@ function mongoRequired() {
 }
 
 export async function PUT(req: Request, ctx: Ctx) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("reels");
   if (denied) return denied;
   const mem = mongoRequired();
   if (mem) return mem;
@@ -69,7 +69,7 @@ export async function PUT(req: Request, ctx: Ctx) {
 }
 
 export async function DELETE(_req: Request, ctx: Ctx) {
-  const denied = await requireAdminApi();
+  const denied = await requireAdminApi("reels");
   if (denied) return denied;
   const mem = mongoRequired();
   if (mem) return mem;

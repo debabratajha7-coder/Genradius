@@ -6,7 +6,7 @@ import { useEffect, useState, type FormEvent, Suspense } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { FadeIn } from "@/components/motion/Reveal";
 
-type Step = "phone" | "otp" | "profile";
+type Step = "phone" | "otp" | "profile" | "email_otp";
 
 const field =
   "w-full rounded-md border-2 border-[var(--ink)] bg-white px-4 py-3.5 text-base shadow-[3px_3px_0_0_var(--ink)] outline-none focus:ring-2 focus:ring-[var(--sand)]";
@@ -30,6 +30,7 @@ function LoginFormInner() {
   const [phone, setPhone] = useState("");
   const [normalized, setNormalized] = useState("");
   const [code, setCode] = useState("");
+  const [emailCode, setEmailCode] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,6 +40,7 @@ function LoginFormInner() {
     googleErrorMessage(search.get("error")),
   );
   const [busy, setBusy] = useState(false);
+  const deletedNotice = search.get("deleted") === "1";
 
   useEffect(() => {
     if (search.get("setup") === "1" && user && user.profileComplete === false) {
@@ -99,16 +101,58 @@ function LoginFormInner() {
     }
   }
 
-  async function completeProfile(e: FormEvent) {
+  async function sendEmailOtpRequest() {
+    const res = await fetch("/api/auth/send-email-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to send email OTP");
+    setMessage(data.message || `OTP sent to ${email}`);
+    setStep("email_otp");
+    setEmailCode("");
+  }
+
+  async function continueToEmailOtp(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
     setError("");
+    setMessage("");
     if (password !== confirm) {
       setError("Passwords do not match");
       setBusy(false);
       return;
     }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters");
+      setBusy(false);
+      return;
+    }
     try {
+      await sendEmailOtpRequest();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send email OTP");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function verifyEmailAndFinish(e: FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      const verifyRes = await fetch("/api/auth/verify-email-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code: emailCode }),
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok) {
+        throw new Error(verifyData.error || "Invalid email OTP");
+      }
+
       const res = await fetch("/api/auth/complete-profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -120,7 +164,20 @@ function LoginFormInner() {
       router.push("/account");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save profile");
+      setError(err instanceof Error ? err.message : "Could not finish signup");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function resendEmailOtp() {
+    setBusy(true);
+    setError("");
+    setMessage("");
+    try {
+      await sendEmailOtpRequest();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to resend");
     } finally {
       setBusy(false);
     }
@@ -132,12 +189,16 @@ function LoginFormInner() {
       p: "We’ll text you a one-time code to verify your number.",
     },
     otp: {
-      h: "Enter OTP",
+      h: "Enter phone OTP",
       p: "Type the code we sent to your phone.",
     },
     profile: {
       h: "Finish your account",
-      p: "Add an email and password so you can sign in and get order updates.",
+      p: "Add your name, email, and password — we’ll verify the email next.",
+    },
+    email_otp: {
+      h: "Verify your email",
+      p: "Enter the code we emailed you via Resend.",
     },
   };
 
@@ -151,6 +212,13 @@ function LoginFormInner() {
           {titles[step].h}
         </h1>
         <p className="mt-2 text-sm text-[var(--moss)]">{titles[step].p}</p>
+
+        {deletedNotice && step === "phone" && (
+          <p className="mt-4 rounded-md border-2 border-[var(--ink)] bg-white px-3 py-2 text-sm font-semibold text-[var(--olive)]">
+            Account deleted. You can create a new one with the same phone or
+            email.
+          </p>
+        )}
 
         {step === "phone" && (
           <>
@@ -224,7 +292,7 @@ function LoginFormInner() {
               </p>
             )}
             <label className="block space-y-1.5 text-xs font-extrabold tracking-wider uppercase">
-              OTP
+              Phone OTP
               <input
                 required
                 inputMode="numeric"
@@ -260,7 +328,7 @@ function LoginFormInner() {
         )}
 
         {step === "profile" && (
-          <form onSubmit={completeProfile} className="mt-6 space-y-4">
+          <form onSubmit={continueToEmailOtp} className="mt-6 space-y-4">
             {normalized && (
               <p className="rounded-md border border-[var(--ink)]/20 bg-white/70 px-3 py-2 text-xs text-[var(--moss)]">
                 Phone verified:{" "}
@@ -321,7 +389,63 @@ function LoginFormInner() {
               disabled={busy}
               className="btn-accent w-full py-3.5 text-sm"
             >
-              {busy ? "Saving…" : "Save & enter Genradius"}
+              {busy ? "Sending email OTP…" : "Continue — verify email"}
+            </button>
+          </form>
+        )}
+
+        {step === "email_otp" && (
+          <form onSubmit={verifyEmailAndFinish} className="mt-6 space-y-4">
+            <p className="text-sm text-[var(--moss)]">
+              Code sent to{" "}
+              <span className="font-bold text-[var(--ink)]">{email}</span>
+            </p>
+            {message && (
+              <p className="rounded-md border border-[var(--ink)]/20 bg-white/70 px-3 py-2 text-xs text-[var(--moss)]">
+                {message}
+              </p>
+            )}
+            <label className="block space-y-1.5 text-xs font-extrabold tracking-wider uppercase">
+              Email OTP
+              <input
+                required
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                placeholder="6-digit code"
+                className={field}
+                value={emailCode}
+                onChange={(e) => setEmailCode(e.target.value)}
+              />
+            </label>
+            {error && (
+              <p className="text-sm font-semibold text-red-700">{error}</p>
+            )}
+            <button
+              type="submit"
+              disabled={busy}
+              className="btn-accent w-full py-3.5 text-sm"
+            >
+              {busy ? "Finishing…" : "Verify & enter Genradius"}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              className="w-full text-xs font-bold tracking-wider text-[var(--moss)] uppercase underline"
+              onClick={() => void resendEmailOtp()}
+            >
+              Resend email code
+            </button>
+            <button
+              type="button"
+              className="w-full text-xs font-bold tracking-wider text-[var(--moss)] uppercase underline"
+              onClick={() => {
+                setStep("profile");
+                setEmailCode("");
+                setError("");
+                setMessage("");
+              }}
+            >
+              Edit email / password
             </button>
           </form>
         )}
