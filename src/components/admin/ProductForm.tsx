@@ -8,25 +8,12 @@ import {
   applyPlacements,
   type PlacementId,
 } from "@/lib/storefront-placements";
-import type { ProductFormValues } from "@/lib/product-form";
+import {
+  EMPTY_PRODUCT_FORM,
+  type ProductFormValues,
+} from "@/lib/product-form";
 
 export type { ProductFormValues } from "@/lib/product-form";
-
-const EMPTY: ProductFormValues = {
-  title: "",
-  slug: "",
-  description: "",
-  images: [],
-  price: "",
-  compareAtPrice: "",
-  badges: "",
-  categorySlug: "",
-  extraCollectionTags: "",
-  sizes: "S,M,L,XL,XXL",
-  featured: false,
-  active: true,
-  placements: [],
-};
 
 export function ProductForm({
   initial,
@@ -39,7 +26,7 @@ export function ProductForm({
 }) {
   const router = useRouter();
   const [form, setForm] = useState<ProductFormValues>({
-    ...EMPTY,
+    ...EMPTY_PRODUCT_FORM,
     categorySlug: categories[0]?.slug ?? "",
     ...initial,
   });
@@ -87,12 +74,27 @@ export function ProductForm({
         images: form.images,
         price: Number(form.price),
         compareAtPrice: Number(form.compareAtPrice || form.price),
+        bestPrice: form.bestPrice === "" ? null : Number(form.bestPrice),
         badges: form.badges,
         categorySlugs: [form.categorySlug],
         collectionTags,
         sizes: form.sizes,
         featured,
         active: form.active,
+        rating: Number(form.rating) || 4.5,
+        reviewCount:
+          form.reviewCount === ""
+            ? form.reviews.length
+            : Number(form.reviewCount),
+        offerTitle: form.offerTitle,
+        offerDetail: form.offerDetail,
+        offerPrice: form.offerPrice === "" ? null : Number(form.offerPrice),
+        socialProof: form.socialProof,
+        sizeGuideImage: form.sizeGuideImage,
+        careFit: form.careFit,
+        highlights: form.highlights,
+        specs: form.specs,
+        reviews: form.reviews,
       };
 
       const res = await fetch(
@@ -177,13 +179,24 @@ export function ProductForm({
         />
       </label>
 
+      <label className="block space-y-1 text-xs font-extrabold uppercase">
+        Care / fit / manufacture
+        <textarea
+          rows={3}
+          className={field}
+          value={form.careFit}
+          onChange={(e) => set("careFit", e.target.value)}
+          placeholder="Shown in the product accordion on the PDP"
+        />
+      </label>
+
       <ImageUploader
         images={form.images}
         onChange={(images) => set("images", images)}
         cropAspect={3 / 4}
       />
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <label className="block space-y-1 text-xs font-extrabold uppercase">
           Price (₹)
           <input
@@ -201,6 +214,16 @@ export function ProductForm({
             className={field}
             value={form.compareAtPrice}
             onChange={(e) => set("compareAtPrice", e.target.value)}
+          />
+        </label>
+        <label className="block space-y-1 text-xs font-extrabold uppercase">
+          Best price (₹)
+          <input
+            type="number"
+            className={field}
+            value={form.bestPrice}
+            onChange={(e) => set("bestPrice", e.target.value)}
+            placeholder="optional"
           />
         </label>
       </div>
@@ -224,6 +247,299 @@ export function ProductForm({
           />
         </label>
       </div>
+
+      <fieldset className="space-y-3 rounded-md border-2 border-[var(--ink)] bg-[var(--sand)]/40 p-4 shadow-[2px_2px_0_0_var(--ink)]">
+        <legend className="px-1 text-xs font-extrabold tracking-wider uppercase">
+          Offer box
+        </legend>
+        <div className="grid gap-4 md:grid-cols-3">
+          <label className="block space-y-1 text-xs font-extrabold uppercase">
+            Title
+            <input
+              className={field}
+              value={form.offerTitle}
+              onChange={(e) => set("offerTitle", e.target.value)}
+              placeholder="Best Offer"
+            />
+          </label>
+          <label className="block space-y-1 text-xs font-extrabold uppercase md:col-span-2">
+            Detail
+            <input
+              className={field}
+              value={form.offerDetail}
+              onChange={(e) => set("offerDetail", e.target.value)}
+              placeholder="Get at ₹399 if buying 3 for ₹1199"
+            />
+          </label>
+          <label className="block space-y-1 text-xs font-extrabold uppercase">
+            Offer price (₹)
+            <input
+              type="number"
+              className={field}
+              value={form.offerPrice}
+              onChange={(e) => set("offerPrice", e.target.value)}
+            />
+          </label>
+          <label className="block space-y-1 text-xs font-extrabold uppercase md:col-span-2">
+            Social proof
+            <input
+              className={field}
+              value={form.socialProof}
+              onChange={(e) => set("socialProof", e.target.value)}
+              placeholder="119 people bought this in last 7 days"
+            />
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset className="space-y-3 rounded-md border-2 border-[var(--ink)] bg-white p-4 shadow-[2px_2px_0_0_var(--ink)]">
+        <legend className="px-1 text-xs font-extrabold tracking-wider uppercase">
+          Size guide image
+        </legend>
+        <ImageUploader
+          label="Size chart"
+          images={form.sizeGuideImage ? [form.sizeGuideImage] : []}
+          onChange={(urls) => set("sizeGuideImage", urls[0] ?? "")}
+          max={1}
+          replaceOnUpload
+          cropAspect={3 / 4}
+        />
+      </fieldset>
+
+      <fieldset className="space-y-3 rounded-md border-2 border-[var(--ink)] bg-white p-4 shadow-[2px_2px_0_0_var(--ink)]">
+        <legend className="px-1 text-xs font-extrabold tracking-wider uppercase">
+          Highlights
+        </legend>
+        {form.highlights.map((h, i) => (
+          <div
+            key={i}
+            className="grid gap-3 rounded-md border border-[var(--border)] p-3 md:grid-cols-[1fr_auto]"
+          >
+            <div className="space-y-2">
+              <input
+                className={field}
+                value={h.title}
+                placeholder="Highlight title"
+                onChange={(e) => {
+                  const next = [...form.highlights];
+                  next[i] = { ...next[i], title: e.target.value };
+                  set("highlights", next);
+                }}
+              />
+              <ImageUploader
+                label={`Highlight ${i + 1} image`}
+                images={h.image ? [h.image] : []}
+                onChange={(urls) => {
+                  const next = [...form.highlights];
+                  next[i] = { ...next[i], image: urls[0] ?? "" };
+                  set("highlights", next);
+                }}
+                max={1}
+                replaceOnUpload
+                cropAspect={1}
+              />
+            </div>
+            <button
+              type="button"
+              className="h-fit rounded-md border-2 border-[var(--ink)] px-3 py-2 text-xs font-bold uppercase"
+              onClick={() =>
+                set(
+                  "highlights",
+                  form.highlights.filter((_, idx) => idx !== i),
+                )
+              }
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          className="btn-accent px-4 py-2 text-xs"
+          onClick={() =>
+            set("highlights", [...form.highlights, { title: "", image: "" }])
+          }
+        >
+          Add highlight
+        </button>
+      </fieldset>
+
+      <fieldset className="space-y-3 rounded-md border-2 border-[var(--ink)] bg-white p-4 shadow-[2px_2px_0_0_var(--ink)]">
+        <legend className="px-1 text-xs font-extrabold tracking-wider uppercase">
+          Specs
+        </legend>
+        {form.specs.map((s, i) => (
+          <div key={i} className="grid gap-2 md:grid-cols-[1fr_1fr_auto]">
+            <input
+              className={field}
+              value={s.label}
+              placeholder="Label"
+              onChange={(e) => {
+                const next = [...form.specs];
+                next[i] = { ...next[i], label: e.target.value };
+                set("specs", next);
+              }}
+            />
+            <input
+              className={field}
+              value={s.value}
+              placeholder="Value"
+              onChange={(e) => {
+                const next = [...form.specs];
+                next[i] = { ...next[i], value: e.target.value };
+                set("specs", next);
+              }}
+            />
+            <button
+              type="button"
+              className="rounded-md border-2 border-[var(--ink)] px-3 py-2 text-xs font-bold uppercase"
+              onClick={() =>
+                set(
+                  "specs",
+                  form.specs.filter((_, idx) => idx !== i),
+                )
+              }
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          className="btn-accent px-4 py-2 text-xs"
+          onClick={() =>
+            set("specs", [...form.specs, { label: "", value: "" }])
+          }
+        >
+          Add spec
+        </button>
+      </fieldset>
+
+      <fieldset className="space-y-3 rounded-md border-2 border-[var(--ink)] bg-[var(--accent-soft)]/30 p-4 shadow-[2px_2px_0_0_var(--ink)]">
+        <legend className="px-1 text-xs font-extrabold tracking-wider uppercase">
+          Ratings & curated reviews
+        </legend>
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="block space-y-1 text-xs font-extrabold uppercase">
+            Rating
+            <input
+              type="number"
+              step="0.1"
+              min="1"
+              max="5"
+              className={field}
+              value={form.rating}
+              onChange={(e) => set("rating", e.target.value)}
+            />
+          </label>
+          <label className="block space-y-1 text-xs font-extrabold uppercase">
+            Review count
+            <input
+              type="number"
+              className={field}
+              value={form.reviewCount}
+              onChange={(e) => set("reviewCount", e.target.value)}
+              placeholder="defaults to reviews list length"
+            />
+          </label>
+        </div>
+        {form.reviews.map((r, i) => (
+          <div
+            key={i}
+            className="space-y-2 rounded-md border-2 border-[var(--ink)] bg-white p-3"
+          >
+            <div className="grid gap-2 md:grid-cols-3">
+              <input
+                className={field}
+                value={r.name}
+                placeholder="Name"
+                onChange={(e) => {
+                  const next = [...form.reviews];
+                  next[i] = { ...next[i], name: e.target.value };
+                  set("reviews", next);
+                }}
+              />
+              <input
+                type="number"
+                min={1}
+                max={5}
+                className={field}
+                value={r.rating}
+                onChange={(e) => {
+                  const next = [...form.reviews];
+                  next[i] = { ...next[i], rating: Number(e.target.value) || 5 };
+                  set("reviews", next);
+                }}
+              />
+              <input
+                className={field}
+                value={r.date}
+                placeholder="Date (e.g. 09/02/2024)"
+                onChange={(e) => {
+                  const next = [...form.reviews];
+                  next[i] = { ...next[i], date: e.target.value };
+                  set("reviews", next);
+                }}
+              />
+            </div>
+            <textarea
+              rows={2}
+              className={field}
+              value={r.body}
+              placeholder="Review text"
+              onChange={(e) => {
+                const next = [...form.reviews];
+                next[i] = { ...next[i], body: e.target.value };
+                set("reviews", next);
+              }}
+            />
+            <div className="flex items-center justify-between gap-3">
+              <label className="flex items-center gap-2 text-xs font-bold">
+                <input
+                  type="checkbox"
+                  checked={r.verified}
+                  onChange={(e) => {
+                    const next = [...form.reviews];
+                    next[i] = { ...next[i], verified: e.target.checked };
+                    set("reviews", next);
+                  }}
+                />
+                Verified
+              </label>
+              <button
+                type="button"
+                className="rounded-md border-2 border-[var(--ink)] px-3 py-1.5 text-xs font-bold uppercase"
+                onClick={() =>
+                  set(
+                    "reviews",
+                    form.reviews.filter((_, idx) => idx !== i),
+                  )
+                }
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        ))}
+        <button
+          type="button"
+          className="btn-accent px-4 py-2 text-xs"
+          onClick={() =>
+            set("reviews", [
+              ...form.reviews,
+              {
+                name: "",
+                rating: 5,
+                date: "",
+                body: "",
+                verified: true,
+              },
+            ])
+          }
+        >
+          Add review
+        </button>
+      </fieldset>
 
       <fieldset className="space-y-3 rounded-md border-2 border-[var(--ink)] bg-[var(--accent-soft)]/30 p-4 shadow-[2px_2px_0_0_var(--ink)]">
         <legend className="px-1 text-xs font-extrabold tracking-wider uppercase">

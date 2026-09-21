@@ -18,6 +18,17 @@ function mapStock(
 }
 
 function toProductLean(doc: Record<string, unknown>): ProductLean {
+  const reviews = Array.isArray(doc.reviews)
+    ? (doc.reviews as ProductLean["reviews"])
+    : [];
+  const reviewCountRaw = doc.reviewCount as number | undefined;
+  const reviewCount =
+    reviewCountRaw != null && reviewCountRaw > 0
+      ? reviewCountRaw
+      : reviews?.length
+        ? reviews.length
+        : 0;
+
   return {
     _id: String(doc._id),
     title: doc.title as string,
@@ -28,7 +39,7 @@ function toProductLean(doc: Record<string, unknown>): ProductLean {
     compareAtPrice: doc.compareAtPrice as number,
     badges: (doc.badges as string[]) ?? [],
     rating: (doc.rating as number) ?? 4.5,
-    reviewCount: (doc.reviewCount as number) ?? 0,
+    reviewCount,
     categorySlugs: (doc.categorySlugs as string[]) ?? [],
     sizes: (doc.sizes as string[]) ?? [],
     stockBySize: mapStock(
@@ -36,6 +47,27 @@ function toProductLean(doc: Record<string, unknown>): ProductLean {
     ),
     featured: Boolean(doc.featured),
     collectionTags: (doc.collectionTags as string[]) ?? [],
+    active: doc.active !== false,
+    bestPrice:
+      doc.bestPrice != null && doc.bestPrice !== ""
+        ? Number(doc.bestPrice)
+        : null,
+    offerTitle: String(doc.offerTitle || ""),
+    offerDetail: String(doc.offerDetail || ""),
+    offerPrice:
+      doc.offerPrice != null && doc.offerPrice !== ""
+        ? Number(doc.offerPrice)
+        : null,
+    socialProof: String(doc.socialProof || ""),
+    sizeGuideImage: String(doc.sizeGuideImage || ""),
+    highlights: Array.isArray(doc.highlights)
+      ? (doc.highlights as ProductLean["highlights"])
+      : [],
+    specs: Array.isArray(doc.specs)
+      ? (doc.specs as ProductLean["specs"])
+      : [],
+    careFit: String(doc.careFit || ""),
+    reviews: reviews ?? [],
   };
 }
 

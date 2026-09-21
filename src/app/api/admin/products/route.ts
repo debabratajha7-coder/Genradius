@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { requireAdminApi } from "@/lib/admin-auth";
 import { connectDB, useMemoryCatalog } from "@/lib/db";
+import {
+  normalizeHighlights,
+  normalizeReviews,
+  normalizeSpecs,
+} from "@/lib/product-form";
 import Product from "@/models/Product";
 import { slugify } from "@/lib/slug";
 
@@ -16,6 +21,15 @@ function mongoRequired() {
     );
   }
   return null;
+}
+
+function splitList(value: unknown, fallback = ""): string[] {
+  if (Array.isArray(value))
+    return value.map(String).map((s) => s.trim()).filter(Boolean);
+  return String(value ?? fallback)
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 export async function GET() {
@@ -56,6 +70,13 @@ export async function POST(req: Request) {
       );
     }
 
+    const reviews = normalizeReviews(body.reviews);
+    const reviewCountRaw = Number(body.reviewCount);
+    const reviewCount =
+      Number.isFinite(reviewCountRaw) && reviewCountRaw > 0
+        ? reviewCountRaw
+        : reviews.length;
+
     const doc = await Product.create({
       title,
       slug,
@@ -63,36 +84,31 @@ export async function POST(req: Request) {
       images,
       price: Number(body.price) || 0,
       compareAtPrice: Number(body.compareAtPrice) || Number(body.price) || 0,
-      badges: Array.isArray(body.badges)
-        ? body.badges
-        : String(body.badges || "")
-            .split(",")
-            .map((s: string) => s.trim())
-            .filter(Boolean),
+      badges: splitList(body.badges),
       rating: Number(body.rating) || 4.5,
-      reviewCount: Number(body.reviewCount) || 0,
-      categorySlugs: Array.isArray(body.categorySlugs)
-        ? body.categorySlugs
-        : String(body.categorySlugs || "")
-            .split(",")
-            .map((s: string) => s.trim())
-            .filter(Boolean),
-      sizes: Array.isArray(body.sizes)
-        ? body.sizes
-        : String(body.sizes || "S,M,L,XL,XXL")
-            .split(",")
-            .map((s: string) => s.trim())
-            .filter(Boolean),
+      reviewCount,
+      categorySlugs: splitList(body.categorySlugs),
+      sizes: splitList(body.sizes, "S,M,L,XL,XXL"),
       stockBySize: body.stockBySize || {},
       featured: Boolean(body.featured),
-      collectionTags: Array.isArray(body.collectionTags)
-        ? body.collectionTags
-        : String(body.collectionTags || "")
-            .split(",")
-            .map((s: string) => s.trim())
-            .filter(Boolean),
+      collectionTags: splitList(body.collectionTags),
       active: body.active !== false,
-      bestPrice: body.bestPrice != null ? Number(body.bestPrice) : null,
+      bestPrice:
+        body.bestPrice != null && body.bestPrice !== ""
+          ? Number(body.bestPrice)
+          : null,
+      offerTitle: String(body.offerTitle || "").trim(),
+      offerDetail: String(body.offerDetail || "").trim(),
+      offerPrice:
+        body.offerPrice != null && body.offerPrice !== ""
+          ? Number(body.offerPrice)
+          : null,
+      socialProof: String(body.socialProof || "").trim(),
+      sizeGuideImage: String(body.sizeGuideImage || "").trim(),
+      highlights: normalizeHighlights(body.highlights),
+      specs: normalizeSpecs(body.specs),
+      careFit: String(body.careFit || "").trim(),
+      reviews,
     });
 
     revalidatePath("/");

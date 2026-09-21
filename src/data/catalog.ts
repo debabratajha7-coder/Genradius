@@ -82,6 +82,16 @@ function demo(
     badges: ["DEMO PHOTO", ...(rest.badges ?? [])],
     sizes: [...sizes],
     stockBySize: stock(),
+    bestPrice: rest.bestPrice ?? null,
+    offerTitle: rest.offerTitle ?? "",
+    offerDetail: rest.offerDetail ?? "",
+    offerPrice: rest.offerPrice ?? null,
+    socialProof: rest.socialProof ?? "",
+    sizeGuideImage: rest.sizeGuideImage ?? "",
+    highlights: rest.highlights ?? [],
+    specs: rest.specs ?? [],
+    careFit: rest.careFit ?? "",
+    reviews: rest.reviews ?? [],
   };
 }
 
