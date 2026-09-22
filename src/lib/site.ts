@@ -13,4 +13,9 @@ export const SITE = {
     "Men's streetwear that refuses to blend in. Oversized tees, polos, cargos — Genradius.",
   locale: "en_IN",
   twitter: "@genradius",
+  domain: "genradius.in",
+  url: "https://genradius.in",
+  email: "info@genradius.in",
+  phone: "+917074890060",
+  phoneDisplay: "70748 90060",
 } as const;

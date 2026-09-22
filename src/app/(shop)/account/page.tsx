@@ -8,6 +8,7 @@ import { DeleteAccountPanel } from "@/components/auth/DeleteAccountPanel";
 import { useCart } from "@/components/cart/CartProvider";
 import { FadeIn } from "@/components/motion/Reveal";
 import { formatINR } from "@/lib/format";
+import { SITE } from "@/lib/site";
 
 const LINKS = [
   {
@@ -393,10 +394,10 @@ export default function AccountPage() {
           </li>
           <li>
             <a
-              href="mailto:hello@genradius.com"
+              href={`mailto:${SITE.email}`}
               className="font-semibold underline"
             >
-              Email hello@genradius.com
+              Email {SITE.email}
             </a>
           </li>
         </ul>

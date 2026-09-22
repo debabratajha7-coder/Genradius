@@ -48,13 +48,14 @@ Admin can: add/edit/delete products, upload images (or paste URLs), paste Instag
 
 ## GitHub
 
-Create an empty repo, then:
+Repo: https://github.com/debabratajha7-coder/Genradius
 
-```bash
-git remote add origin git@github.com:YOUR_USER/genradius.git
-git add .
-git commit -m "Initial Genradius storefront MVP"
-git push -u origin main
-```
+## Go live (genradius.in)
+
+1. Deploy to Vercel (import the GitHub repo).
+2. Set env vars from `.env.example` — especially `MONGODB_URI`, `USE_MEMORY_CATALOG=false`, admin secrets, Cloudinary, and **`NEXT_PUBLIC_APP_URL=https://genradius.in`**.
+3. Attach domain `genradius.in` (+ `www`) in Vercel → Domains, then point DNS as instructed.
+4. In Google Cloud OAuth, add redirect URI: `https://genradius.in/api/auth/google/callback`.
+5. Redeploy and smoke-test shop, admin login, and checkout.
 
 See [AGENTS.md](./AGENTS.md) for architecture notes aimed at future Cursor sessions.

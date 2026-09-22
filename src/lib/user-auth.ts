@@ -84,16 +84,18 @@ export async function requireUserApi() {
   return { error: null, session };
 }
 
+import { getSiteUrl } from "@/lib/site";
+
 export function appBaseUrl(req?: Request): string {
   if (process.env.NEXT_PUBLIC_APP_URL) {
     return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
   }
   if (req) {
     const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
-    const proto = req.headers.get("x-forwarded-proto") || "http";
-    if (host) return `${proto}://${host}`;
+    const proto = req.headers.get("x-forwarded-proto") || "https";
+    if (host) return `${proto.split(",")[0].trim()}://${host.split(",")[0].trim()}`;
   }
-  return "http://localhost:3000";
+  return getSiteUrl();
 }
 
 export function isGoogleConfigured(): boolean {

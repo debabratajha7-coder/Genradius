@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { SITE } from "@/lib/site";
 
 export function Footer() {
   const [email, setEmail] = useState("");
@@ -130,19 +131,36 @@ export function Footer() {
               <li>
                 <Link href="/#blogs">Blog</Link>
               </li>
-              <li>
-                <a href="mailto:hello@genradius.com">Contact</a>
-              </li>
             </ul>
           </div>
           <div>
             <h3 className="mb-3 text-[10px] font-extrabold tracking-[0.16em] text-[var(--sand)] uppercase">
-              Social
+              Contact us
             </h3>
-            <ul className="space-y-2 text-xs font-semibold uppercase sm:text-sm">
-              <li>Instagram</li>
-              <li>YouTube</li>
-              <li>WhatsApp</li>
+            <ul className="space-y-2 text-xs font-semibold sm:text-sm">
+              <li>
+                <a href={`tel:${SITE.phone}`} className="normal-case tracking-wide">
+                  {SITE.phoneDisplay}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`mailto:${SITE.email}`}
+                  className="normal-case tracking-wide break-all"
+                >
+                  {SITE.email}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`https://wa.me/${SITE.phone.replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="uppercase"
+                >
+                  WhatsApp
+                </a>
+              </li>
             </ul>
           </div>
         </div>

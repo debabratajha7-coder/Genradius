@@ -51,6 +51,9 @@ export function OrganizationJsonLd() {
     url: base,
     description: SITE.description,
     logo: `${base}/icon.png`,
+    email: SITE.email,
+    telephone: SITE.phone,
+    sameAs: [],
   };
 
   return (
