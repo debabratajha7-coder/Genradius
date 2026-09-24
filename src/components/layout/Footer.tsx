@@ -138,6 +138,9 @@ export function Footer() {
               Contact us
             </h3>
             <ul className="space-y-2 text-xs font-semibold sm:text-sm">
+              <li className="font-extrabold tracking-wide text-[var(--sand)] uppercase">
+                {SITE.contactName}
+              </li>
               <li>
                 <a href={`tel:${SITE.phone}`} className="normal-case tracking-wide">
                   {SITE.phoneDisplay}
