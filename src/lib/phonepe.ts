@@ -9,11 +9,12 @@ function bases() {
   const prod = process.env.PHONEPE_ENV === "production";
   return prod
     ? {
-        auth: "https://api.phonepe.com/apis/identity-manager/v1/oauth/login",
+        // https://developer.phonepe.com — Standard Checkout OAuth
+        auth: "https://api.phonepe.com/apis/identity-manager/v1/oauth/token",
         pg: "https://api.phonepe.com/apis/pg",
       }
     : {
-        auth: "https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/login",
+        auth: "https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token",
         pg: "https://api-preprod.phonepe.com/apis/pg-sandbox",
       };
 }
