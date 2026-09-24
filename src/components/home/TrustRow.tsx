@@ -13,7 +13,7 @@ export function TrustRow() {
         <div className="grid grid-cols-3 gap-1.5 rounded-md border-2 border-[var(--ink)] bg-[var(--surface)] px-2 py-4 text-center shadow-[3px_3px_0_0_var(--ink)] sm:gap-2 sm:rounded-2xl sm:border sm:border-[var(--border)] sm:px-4 sm:py-8 sm:shadow-none">
           {[
             { icon: "₹", label: "COD" },
-            { icon: "🚚", label: "Free ship ₹799+" },
+            { icon: "🚚", label: "Free shipping" },
             { icon: "↺", label: "Easy returns" },
           ].map((item) => (
             <div key={item.label} className="px-0.5">

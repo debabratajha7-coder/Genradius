@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 const SHIPPING =
-  "Free shipping on orders ₹799+. We ship pan-India — most metros land in 3–6 days.";
+  "Free shipping on all orders. We ship pan-India — most metros land in 3–6 days.";
 const RETURNS =
   "Easy 7-day returns & exchange. Item must be unused with tags on. Full refund if you don’t love the fit.";
 
@@ -71,7 +71,7 @@ export function ProductAccordions({
       </AccordionItem>
       <AccordionItem
         title="Shipping info"
-        subtitle="We offer free shipping across India on ₹799+."
+        subtitle="We offer free shipping across India."
       >
         {SHIPPING}
       </AccordionItem>

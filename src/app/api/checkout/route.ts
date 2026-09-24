@@ -51,15 +51,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: priced.error }, { status: 400 });
     }
 
-    let shipping = 79;
+    // Free shipping for customers — Shiprocket booking can still run post-payment
+    let shipping = 0;
     let courier = "Standard";
     if (isShiprocketConfigured()) {
-      const quote = await quoteShipping({
-        deliveryPincode: address.pincode,
-        weightKg: weightKg(priced.items),
-      });
-      shipping = quote.amount;
-      courier = quote.courier;
+      try {
+        const quote = await quoteShipping({
+          deliveryPincode: address.pincode,
+          weightKg: weightKg(priced.items),
+        });
+        courier = quote.courier || courier;
+      } catch {
+        /* keep Standard — charge stays 0 */
+      }
     }
 
     const total = priced.subtotal + shipping;

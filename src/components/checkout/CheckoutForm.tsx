@@ -55,11 +55,7 @@ export function CheckoutForm() {
         setShipping(Number(data.amount) || 0);
         setCourier(data.courier || "");
         setEtd(data.etd || "");
-        setQuoteNote(
-          data.fallback
-            ? "Shiprocket keys aren’t set — using a flat ₹79 until they are."
-            : "",
-        );
+        setQuoteNote("Free shipping on all orders.");
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
         setShipping(null);
@@ -135,7 +131,7 @@ export function CheckoutForm() {
           Delivery details
         </h1>
         <p className="text-sm text-[var(--moss)]">
-          We’ll charge with PhonePe, then book Shiprocket delivery to this address.
+          We’ll take payment securely, then book Shiprocket delivery to this address.
         </p>
 
         <label className="block space-y-1 text-xs font-extrabold uppercase">
@@ -213,10 +209,10 @@ export function CheckoutForm() {
         {error && <p className="text-sm font-semibold text-red-700">{error}</p>}
         <button type="submit" disabled={busy || shipping == null} className="btn-accent w-full py-3.5 text-sm">
           {busy
-            ? "Opening PhonePe…"
+            ? "Processing…"
             : shipping == null
               ? "Enter pincode for shipping"
-              : `Pay ${formatINR(total)} with PhonePe`}
+              : `Pay ${formatINR(total)}`}
         </button>
       </form>
 
@@ -248,7 +244,11 @@ export function CheckoutForm() {
               Shipping{courier ? ` · ${courier}` : ""}
             </dt>
             <dd className="font-bold">
-              {shipping == null ? "—" : formatINR(shipping)}
+              {shipping == null
+                ? "—"
+                : shipping === 0
+                  ? "Free"
+                  : formatINR(shipping)}
             </dd>
           </div>
           {etd && (

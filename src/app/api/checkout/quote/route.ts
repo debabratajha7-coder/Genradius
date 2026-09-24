@@ -28,9 +28,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: priced.error }, { status: 400 });
     }
 
+    // Free shipping — no auto charge (Shiprocket still used later for booking only)
     if (!isShiprocketConfigured()) {
       return NextResponse.json({
-        amount: 79,
+        amount: 0,
         courier: "Standard",
         etd: "",
         fallback: true,
@@ -41,7 +42,11 @@ export async function POST(req: Request) {
       deliveryPincode: pincode,
       weightKg: weightKg(priced.items),
     });
-    return NextResponse.json({ ...quote, fallback: false });
+    return NextResponse.json({
+      ...quote,
+      amount: 0,
+      fallback: false,
+    });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Shipping quote failed";
     return NextResponse.json({ error: message }, { status: 502 });

@@ -36,13 +36,23 @@ async function accessToken(): Promise<string> {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
   });
-  const data = (await res.json()) as {
+  const data = (await res.json().catch(() => ({}))) as {
     access_token?: string;
     expires_at?: number;
     message?: string;
+    code?: string;
+    error?: string;
+    error_description?: string;
   };
   if (!res.ok || !data.access_token) {
-    throw new Error(data.message || "PhonePe auth failed");
+    const detail =
+      data.message ||
+      data.error_description ||
+      data.error ||
+      data.code ||
+      `HTTP ${res.status}`;
+    console.error("[phonepe] auth failed", res.status, detail);
+    throw new Error(`PhonePe auth failed: ${detail}`);
   }
   const expires =
     typeof data.expires_at === "number"

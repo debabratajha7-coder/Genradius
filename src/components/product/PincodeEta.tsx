@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { formatINR } from "@/lib/format";
 
 export function PincodeEta({
   productId,
@@ -72,15 +71,13 @@ export function PincodeEta({
       ) : null}
       {result ? (
         <p className="mt-2 text-sm text-[var(--moss)]">
-          {result.fallback
-            ? `Ships via Standard — estimate ${formatINR(result.amount)} (confirm at checkout).`
-            : `${result.courier || "Courier"} · ${
-                result.etd ? `ETA ${result.etd} · ` : ""
-              }${formatINR(result.amount)}`}
+          {result.courier || "Standard"}
+          {result.etd ? ` · ETA ${result.etd}` : ""}
+          {" · Free shipping"}
         </p>
       ) : (
         <p className="mt-2 text-xs text-[var(--muted)]">
-          Enter pincode to estimate delivery.
+          Enter pincode to check delivery. Shipping is free.
         </p>
       )}
     </div>
