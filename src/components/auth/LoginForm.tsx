@@ -9,7 +9,7 @@ import { FadeIn } from "@/components/motion/Reveal";
 type Step = "phone" | "otp" | "profile" | "email_otp";
 
 const field =
-  "w-full rounded-md border-2 border-[var(--ink)] bg-white px-4 py-3.5 text-base shadow-[3px_3px_0_0_var(--ink)] outline-none focus:ring-2 focus:ring-[var(--sand)]";
+  "w-full rounded-2xl border border-[var(--ink)]/12 bg-white px-4 py-3.5 text-base outline-none focus:ring-2 focus:ring-[var(--pop)]";
 
 function googleErrorMessage(code: string | null): string {
   if (!code) return "";
@@ -204,17 +204,17 @@ function LoginFormInner() {
 
   return (
     <FadeIn className="mx-auto w-full max-w-md px-0 py-0 sm:px-4 sm:py-16">
-      <div className="min-h-[calc(100dvh-8rem)] border-0 bg-[var(--background)] p-5 sm:min-h-0 sm:rounded-md sm:border-2 sm:border-[var(--ink)] sm:bg-[var(--sand)]/40 sm:p-8 sm:shadow-[6px_6px_0_0_var(--ink)]">
+      <div className="min-h-[calc(100dvh-8rem)] border-0 bg-[var(--background)] p-5 sm:min-h-0 sm:rounded-2xl sm:border sm:border-[var(--ink)]/10 sm:bg-white/60 sm:p-8">
         <p className="text-[11px] font-extrabold tracking-[0.2em] text-[var(--moss)] uppercase">
           Member access
         </p>
-        <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-extrabold uppercase">
+        <h1 className="mt-2 font-[family-name:var(--font-heavy)] text-4xl leading-[0.95] tracking-tight uppercase sm:text-5xl">
           {titles[step].h}
         </h1>
         <p className="mt-2 text-sm text-[var(--moss)]">{titles[step].p}</p>
 
         {deletedNotice && step === "phone" && (
-          <p className="mt-4 rounded-md border-2 border-[var(--ink)] bg-white px-3 py-2 text-sm font-semibold text-[var(--olive)]">
+          <p className="mt-4 rounded-2xl border border-[var(--ink)]/12 bg-white px-3 py-2 text-sm font-semibold text-[var(--olive)]">
             Account deleted. You can create a new one with the same phone or
             email.
           </p>
@@ -255,7 +255,7 @@ function LoginFormInner() {
 
             <a
               href="/api/auth/google"
-              className="flex w-full items-center justify-center gap-3 rounded-md border-2 border-[var(--ink)] bg-white px-4 py-3.5 text-sm font-extrabold tracking-wider uppercase shadow-[3px_3px_0_0_var(--ink)] transition hover:bg-[var(--accent-soft)]"
+              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-[var(--ink)]/12 bg-white px-4 py-3.5 text-sm font-extrabold tracking-wider uppercase transition hover:bg-[var(--surface)]"
             >
               <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden>
                 <path
@@ -287,7 +287,7 @@ function LoginFormInner() {
               <span className="font-bold text-[var(--ink)]">{normalized}</span>
             </p>
             {message && (
-              <p className="rounded-md border border-[var(--ink)]/20 bg-white/70 px-3 py-2 text-xs text-[var(--moss)]">
+              <p className="rounded-2xl border border-[var(--ink)]/20 bg-white/70 px-3 py-2 text-xs text-[var(--moss)]">
                 {message}
               </p>
             )}
@@ -330,7 +330,7 @@ function LoginFormInner() {
         {step === "profile" && (
           <form onSubmit={continueToEmailOtp} className="mt-6 space-y-4">
             {normalized && (
-              <p className="rounded-md border border-[var(--ink)]/20 bg-white/70 px-3 py-2 text-xs text-[var(--moss)]">
+              <p className="rounded-2xl border border-[var(--ink)]/20 bg-white/70 px-3 py-2 text-xs text-[var(--moss)]">
                 Phone verified:{" "}
                 <span className="font-bold text-[var(--ink)]">{normalized}</span>
               </p>
@@ -401,7 +401,7 @@ function LoginFormInner() {
               <span className="font-bold text-[var(--ink)]">{email}</span>
             </p>
             {message && (
-              <p className="rounded-md border border-[var(--ink)]/20 bg-white/70 px-3 py-2 text-xs text-[var(--moss)]">
+              <p className="rounded-2xl border border-[var(--ink)]/20 bg-white/70 px-3 py-2 text-xs text-[var(--moss)]">
                 {message}
               </p>
             )}

@@ -1,4 +1,5 @@
 import { HeroCarousel } from "@/components/home/HeroCarousel";
+import { UspMarquee } from "@/components/home/UspMarquee";
 import { ProductCarousel } from "@/components/home/ProductCarousel";
 import { WatchAndBuy } from "@/components/home/WatchAndBuy";
 import { TopCategories } from "@/components/home/TopCategories";
@@ -12,6 +13,7 @@ import { getCategories, getProducts } from "@/lib/products";
 import { getActiveReels } from "@/lib/reels";
 import { getHeroSlides } from "@/lib/hero";
 import { getHomeMedia } from "@/lib/home-media";
+import { getCheckoutSettings } from "@/lib/site-settings";
 
 export default async function HomePage() {
   const [
@@ -23,6 +25,7 @@ export default async function HomePage() {
     reels,
     heroSlides,
     homeMedia,
+    settings,
   ] = await Promise.all([
     getCategories(),
     getProducts({ featured: true, limit: 12 }),
@@ -32,47 +35,90 @@ export default async function HomePage() {
     getActiveReels(12),
     getHeroSlides(),
     getHomeMedia(),
+    getCheckoutSettings().catch(() => null),
   ]);
+
+  const freeShippingThreshold = settings?.freeShippingThreshold ?? 1000;
+  const codEnabled = settings?.codEnabled ?? true;
 
   return (
     <>
       <HeroCarousel slides={heroSlides} />
+      <UspMarquee
+        freeShippingThreshold={freeShippingThreshold}
+        codEnabled={codEnabled}
+      />
+
       <Reveal>
         <TopCategories categories={categories} />
       </Reveal>
+
       <ProductCarousel
+        index="02 — Bestsellers"
         title="Our Bestsellers"
+        heading={
+          <>
+            What the circle <em>keeps buying</em>
+          </>
+        }
+        subtitle="Proven fits, restocked on repeat. If you're new here, start with these."
         products={bestsellers}
-        ctaLabel="See more bestsellers"
+        ctaLabel="See all bestsellers"
         ctaHref="/shop"
       />
+
       <Reveal>
-        <WatchAndBuy products={watch} reels={reels} />
+        <WatchAndBuy
+          products={watch.length ? watch : bestsellers}
+          reels={reels}
+        />
       </Reveal>
+
       <ProductCarousel
+        index="03 — Premium"
         title="Centre Stage Collection"
+        heading={
+          <>
+            Centre <em>stage</em>
+          </>
+        }
+        subtitle="Heavier fabrics, cleaner graphics. The pieces you build a look around."
         products={centreStage}
-        ctaLabel="Explore all products"
-        ctaHref="/shop"
+        ctaLabel="Explore premium"
+        ctaHref="/shop?collection=premium"
       />
-      <ProductCarousel
-        title="New Arrivals"
-        products={newArrivals}
-        ctaLabel="See all new arrivals"
-        ctaHref="/shop?collection=radius-range"
-      />
+
       <Reveal>
         <CollectionStrip tiles={homeMedia.collections} />
       </Reveal>
-      <Reveal y={48}>
-        <RadiusBand media={homeMedia} />
-      </Reveal>
+
+      <ProductCarousel
+        index="05 — Just landed"
+        title="New Arrivals"
+        heading={
+          <>
+            Fresh off the <em>press</em>
+          </>
+        }
+        subtitle="The latest drop from the Radius Range. Sizes go fast."
+        products={newArrivals}
+        ctaLabel="See new arrivals"
+        ctaHref="/shop?collection=radius-range"
+      />
+
+      <RadiusBand media={homeMedia} />
+
       <Reveal>
-        <TrustRow />
+        <TrustRow
+          freeShippingThreshold={freeShippingThreshold}
+          codEnabled={codEnabled}
+        />
       </Reveal>
+
       <Reveal>
         <BlogTeaser />
       </Reveal>
+
       <Reveal>
         <FeaturedOn />
       </Reveal>

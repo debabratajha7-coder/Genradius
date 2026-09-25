@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, Syne, Unbounded } from "next/font/google";
+import { Anton, Outfit, Syne, Unbounded } from "next/font/google";
 import { OrganizationJsonLd } from "@/components/seo/JsonLd";
 import { getSiteUrl, SITE } from "@/lib/site";
 import "./globals.css";
@@ -20,6 +20,12 @@ const logo = Unbounded({
   subsets: ["latin"],
   weight: ["600", "700", "800"],
   variable: "--font-logo",
+});
+
+const heavy = Anton({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-heavy",
 });
 
 const siteUrl = getSiteUrl();
@@ -83,7 +89,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#f7f5f0",
+  themeColor: "#17160f",
 };
 
 export default function RootLayout({
@@ -94,7 +100,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${body.variable} ${logo.variable} h-full`}
+      className={`${display.variable} ${body.variable} ${logo.variable} ${heavy.variable} h-full`}
     >
       <body className="flex min-h-full flex-col antialiased">
         <OrganizationJsonLd />

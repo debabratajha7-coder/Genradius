@@ -52,7 +52,7 @@ function ReturnInner() {
 
   return (
     <div className="mx-auto max-w-lg px-4 py-16 text-center">
-      <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold uppercase">
+      <h1 className="font-[family-name:var(--font-heavy)] text-4xl leading-[0.95] tracking-tight uppercase sm:text-5xl">
         {status}
       </h1>
       {detail && <p className="mt-3 text-sm text-[var(--moss)]">{detail}</p>}

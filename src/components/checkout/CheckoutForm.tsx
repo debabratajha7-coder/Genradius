@@ -8,7 +8,7 @@ import { INDIAN_STATES } from "@/lib/india-states";
 import { formatINR } from "@/lib/format";
 
 const field =
-  "w-full rounded-md border-2 border-[var(--ink)] bg-white px-3 py-3 text-sm shadow-[2px_2px_0_0_var(--ink)] outline-none";
+  "w-full rounded-2xl border border-[var(--ink)]/12 bg-white px-3 py-3 text-sm outline-none";
 
 type Settings = {
   freeShippingThreshold: number;
@@ -186,7 +186,7 @@ export function CheckoutForm() {
   if (!items.length) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center">
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold uppercase">
+        <h1 className="font-[family-name:var(--font-heavy)] text-4xl leading-[0.95] tracking-tight uppercase sm:text-5xl">
           Bag is empty
         </h1>
         <Link href="/shop" className="btn-accent mt-6 inline-flex px-8 py-3 text-sm">
@@ -210,11 +210,11 @@ export function CheckoutForm() {
         <p className="text-[11px] font-extrabold tracking-[0.2em] text-[var(--moss)] uppercase">
           Checkout
         </p>
-        <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold uppercase">
+        <h1 className="font-[family-name:var(--font-heavy)] text-4xl leading-[0.95] tracking-tight uppercase sm:text-5xl">
           Delivery & payment
         </h1>
 
-        <fieldset className="space-y-2 rounded-md border-2 border-[var(--ink)] bg-white p-4 shadow-[3px_3px_0_0_var(--ink)]">
+        <fieldset className="space-y-2 rounded-2xl border border-[var(--ink)]/12 bg-white p-4">
           <legend className="px-1 text-xs font-extrabold uppercase">
             Pay how?
           </legend>
@@ -314,7 +314,7 @@ export function CheckoutForm() {
         </div>
 
         {paymentMethod === "cod" && settings?.codOtpRequired ? (
-          <div className="space-y-2 rounded-md border-2 border-[var(--ink)] bg-[var(--sand)]/40 p-3">
+          <div className="space-y-2 rounded-2xl border border-[var(--ink)]/12 bg-white/60 p-3">
             <div className="flex flex-wrap gap-2">
               <input
                 className={`${field} max-w-[10rem]`}
@@ -325,7 +325,7 @@ export function CheckoutForm() {
               />
               <button
                 type="button"
-                className="rounded-md border-2 border-[var(--ink)] bg-white px-3 py-2 text-xs font-extrabold uppercase"
+                className="rounded-2xl border border-[var(--ink)]/12 bg-white px-3 py-2 text-xs font-extrabold uppercase"
                 onClick={() => void sendCodOtp().catch((e) => setError(e.message))}
               >
                 Send OTP
@@ -357,7 +357,7 @@ export function CheckoutForm() {
         </button>
       </form>
 
-      <aside className="h-fit rounded-md border-2 border-[var(--ink)] bg-white p-5 shadow-[4px_4px_0_0_var(--ink)]">
+      <aside className="h-fit rounded-2xl border border-[var(--ink)]/12 bg-white p-5">
         <h2 className="text-sm font-extrabold tracking-wider uppercase">Your bag</h2>
         <ul className="mt-4 space-y-3">
           {items.map((item) => (

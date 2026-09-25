@@ -34,14 +34,14 @@ export function ComingSoonPopup({
     <div
       role="status"
       aria-labelledby={titleId}
-      className={`relative w-full max-w-sm rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] px-6 py-8 text-center shadow-[6px_6px_0_0_var(--ink)] ${className}`}
+      className={`relative w-full max-w-sm rounded-[24px] bg-[var(--background)] px-6 py-8 text-center ${className}`}
     >
       <p className="text-[10px] font-extrabold tracking-[0.22em] text-[var(--moss)] uppercase">
         Genradius
       </p>
       <h3
         id={titleId}
-        className="mt-2 font-[family-name:var(--font-display)] text-2xl tracking-wide text-[var(--ink)] uppercase sm:text-3xl"
+        className="mt-2 font-[family-name:var(--font-heavy)] text-3xl leading-none tracking-tight text-[var(--ink)] uppercase sm:text-4xl"
       >
         Coming soon
       </h3>

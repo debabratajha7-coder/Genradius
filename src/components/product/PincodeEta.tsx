@@ -43,43 +43,57 @@ export function PincodeEta({
   }
 
   return (
-    <div className="mt-5 rounded-md border-2 border-[var(--ink)] bg-white p-3 shadow-[3px_3px_0_0_var(--ink)]">
-      <p className="text-[10px] font-extrabold tracking-[0.16em] text-[var(--muted)] uppercase">
-        Delivery details
-      </p>
-      <div className="mt-2 flex gap-2">
+    <div className="panel mt-7 p-4 sm:p-5">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[10px] font-bold tracking-[0.2em] text-[var(--muted)] uppercase">
+          Delivery to your pincode
+        </p>
+        <span className="text-[10px] font-bold tracking-[0.16em] text-[var(--olive)] uppercase">
+          Pan-India
+        </span>
+      </div>
+      <form
+        className="mt-3 flex items-center gap-1 rounded-full border border-[var(--ink)]/12 bg-[var(--background)] p-1 pl-4 transition focus-within:border-[var(--ink)]/50"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!busy && pin.length === 6) void check();
+        }}
+      >
         <input
           inputMode="numeric"
           maxLength={6}
           value={pin}
           onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
-          placeholder="Enter pincode"
-          className="min-w-0 flex-1 rounded-md border-2 border-[var(--ink)] bg-[var(--background)] px-3 py-2.5 text-sm shadow-[2px_2px_0_0_var(--ink)]"
+          placeholder="6-digit pincode"
+          className="min-w-0 flex-1 bg-transparent py-2 text-sm font-semibold tabular-nums outline-none placeholder:font-medium placeholder:text-[var(--muted)]"
           aria-label="Delivery pincode"
         />
         <button
-          type="button"
+          type="submit"
           disabled={busy || pin.length !== 6}
-          onClick={check}
-          className="btn-accent shrink-0 px-4 py-2 text-xs disabled:opacity-50"
+          className="btn-ink h-10 shrink-0 px-5 text-[11px] disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {busy ? "…" : "Check"}
+          {busy ? "Checking…" : "Check"}
         </button>
+      </form>
+      <div className="mt-3 text-xs">
+        {error ? (
+          <p className="font-semibold text-red-700">{error}</p>
+        ) : result ? (
+          <p className="inline-flex flex-wrap items-center gap-2 font-semibold text-[var(--ink)]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--pop)]" />
+            {result.courier || "Standard"}
+            {result.etd ? ` · ETA ${result.etd}` : ""}
+            <span className="text-[var(--muted)]">
+              · {result.amount > 0 ? `Shipping ₹${result.amount}` : "Free shipping"}
+            </span>
+          </p>
+        ) : (
+          <p className="text-[var(--muted)]">
+            Dispatch in 24–48h. Metros usually land in 3–6 days.
+          </p>
+        )}
       </div>
-      {error ? (
-        <p className="mt-2 text-xs font-semibold text-red-700">{error}</p>
-      ) : null}
-      {result ? (
-        <p className="mt-2 text-sm text-[var(--moss)]">
-          {result.courier || "Standard"}
-          {result.etd ? ` · ETA ${result.etd}` : ""}
-          {" · Free shipping"}
-        </p>
-      ) : (
-        <p className="mt-2 text-xs text-[var(--muted)]">
-          Enter pincode to check delivery. Shipping is free.
-        </p>
-      )}
     </div>
   );
 }

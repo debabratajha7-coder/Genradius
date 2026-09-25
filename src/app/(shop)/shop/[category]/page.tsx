@@ -40,11 +40,12 @@ export default async function CategoryPage({ params }: Props) {
       categories={categories}
       activeSlug={slug}
       breadcrumb={
-        <p className="mb-2 text-[10px] font-bold tracking-[0.2em] text-[var(--muted)] uppercase sm:text-xs">
-          <Link href="/shop" className="hover:text-black">
+        <p className="mb-3 text-[10px] font-bold tracking-[0.2em] text-[var(--muted)] uppercase">
+          <Link href="/shop" className="transition hover:text-[var(--ink)]">
             Shop
-          </Link>{" "}
-          / {cat.name}
+          </Link>
+          <span className="mx-2 text-[var(--pop-ink)]/40">/</span>
+          <span className="text-[var(--ink)]">{cat.name}</span>
         </p>
       }
     />

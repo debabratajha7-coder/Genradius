@@ -62,7 +62,7 @@ export function MobileTabBar() {
 
   return (
     <nav
-      className="app-tabbar fixed inset-x-0 bottom-0 z-30 border-t-2 border-[var(--ink)] bg-[var(--background)]/95 shadow-[0_-8px_30px_rgba(42,41,30,0.08)] backdrop-blur-xl transition-transform duration-300 lg:hidden"
+      className="app-tabbar fixed inset-x-0 bottom-0 z-30 border-t border-[var(--ink)]/10 bg-[var(--background)]/92 shadow-[0_-8px_30px_rgba(23,22,15,0.08)] backdrop-blur-xl transition-transform duration-300 lg:hidden"
       aria-label="App navigation"
     >
       <div className="mx-auto grid h-[var(--app-tabbar-h)] max-w-lg grid-cols-4 px-1">
@@ -84,7 +84,7 @@ export function MobileTabBar() {
                 <span className="relative">
                   {tab.icon(active)}
                   {count > 0 && (
-                    <span className="absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-sm border border-[var(--ink)] bg-[var(--sand)] px-1 text-[9px] font-extrabold text-[var(--ink)]">
+                    <span className="absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--pop)] px-1 text-[9px] font-black text-[var(--pop-ink)]">
                       {count > 9 ? "9+" : count}
                     </span>
                   )}
@@ -106,7 +106,7 @@ export function MobileTabBar() {
             >
               {active && (
                 <span
-                  className="absolute top-0 h-0.5 w-8 rounded-full bg-[var(--sand)]"
+                  className="absolute top-0 h-[3px] w-8 rounded-full bg-[var(--pop)]"
                   aria-hidden
                 />
               )}

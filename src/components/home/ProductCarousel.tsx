@@ -1,20 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import type { ProductLean } from "@/types/catalog";
 import { ProductCard } from "@/components/product/ProductCard";
-import { Reveal } from "@/components/motion/Reveal";
+import { Reveal, RevealItem, RevealStagger } from "@/components/motion/Reveal";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ComingSoonPopup } from "@/components/ui/ComingSoonPopup";
 
 export function ProductCarousel({
   title,
+  heading,
+  index,
+  subtitle,
   products,
   ctaLabel,
   ctaHref,
   phoneLimit = 6,
 }: {
+  /** Plain title (used for empty-state label + fallback) */
   title: string;
+  /** Rich heading — may contain <em> for outline word */
+  heading?: ReactNode;
+  index?: string;
+  subtitle?: ReactNode;
   products: ProductLean[];
   ctaLabel?: string;
   ctaHref?: string;
@@ -27,89 +36,90 @@ export function ProductCarousel({
 
   const scroll = (dir: -1 | 1) => {
     scroller.current?.scrollBy({
-      left: dir * 320,
+      left: dir * 640,
       behavior: "smooth",
     });
   };
 
   return (
-    <section className="mx-auto max-w-[1400px] px-3 py-6 sm:px-6 sm:py-14">
+    <section className="mx-auto max-w-[1400px] px-3 py-8 sm:px-6 sm:py-16">
       <Reveal>
-        <div
-          className={
-            !empty && ctaLabel && ctaHref
-              ? "section-heading section-heading--center"
-              : "section-heading section-heading--solo"
+        <SectionHeading
+          index={index}
+          title={heading ?? title}
+          subtitle={subtitle}
+          href={!empty ? ctaHref : undefined}
+          linkLabel={ctaLabel}
+          actions={
+            !empty ? (
+              <div className="hidden gap-2 lg:flex">
+                <button
+                  type="button"
+                  onClick={() => scroll(-1)}
+                  className="icon-chip h-11 w-11 text-base"
+                  aria-label="Scroll left"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scroll(1)}
+                  className="icon-chip h-11 w-11 text-base"
+                  aria-label="Scroll right"
+                >
+                  →
+                </button>
+              </div>
+            ) : null
           }
-        >
-          <h2 className="section-title">{title}</h2>
-          {!empty && ctaLabel && ctaHref ? (
-            <Link
-              href={ctaHref}
-              className="shrink-0 pb-1 text-[10px] font-extrabold tracking-wider text-[var(--moss)] uppercase underline-offset-2 hover:underline lg:hidden"
-            >
-              View all
-            </Link>
-          ) : null}
-        </div>
+        />
       </Reveal>
 
       {empty ? <ComingSoonPopup label={title} /> : null}
 
       {/* Phone: 2-col commerce grid */}
       {!empty ? (
-      <div className="app-product-grid grid grid-cols-2 gap-2.5 lg:hidden">
-        {phoneProducts.map((p) => (
-          <ProductCard key={p._id} product={p} />
-        ))}
-      </div>
-      ) : null}
-
-      {/* Desktop / tablet: horizontal carousel */}
-      {!empty ? (
-      <div className="relative hidden lg:block">
-        <button
-          type="button"
-          onClick={() => scroll(-1)}
-          className="absolute top-[38%] left-0 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-white text-lg shadow-[3px_3px_0_0_var(--ink)] transition hover:bg-[var(--sand)] sm:left-2 sm:translate-x-0"
-          aria-label="Scroll left"
-        >
-          ‹
-        </button>
-        <button
-          type="button"
-          onClick={() => scroll(1)}
-          className="absolute top-[38%] right-0 z-10 flex h-10 w-10 translate-x-1/2 items-center justify-center rounded-sm border-2 border-[var(--ink)] bg-white text-lg shadow-[3px_3px_0_0_var(--ink)] transition hover:bg-[var(--sand)] sm:right-2 sm:translate-x-0"
-          aria-label="Scroll right"
-        >
-          ›
-        </button>
-        <div
-          ref={scroller}
-          className="snap-x-mandatory flex gap-5 overflow-x-auto px-1 pb-3 scrollbar-none"
-          style={{ scrollbarWidth: "none" }}
-        >
-          {products.map((p) => (
-            <div key={p._id} className="snap-start w-[270px] shrink-0">
+        <RevealStagger className="app-product-grid grid grid-cols-2 gap-x-2.5 gap-y-5 lg:hidden">
+          {phoneProducts.map((p) => (
+            <RevealItem key={p._id}>
               <ProductCard product={p} />
-            </div>
+            </RevealItem>
           ))}
-        </div>
-      </div>
+        </RevealStagger>
       ) : null}
 
-      {!empty && ctaLabel && ctaHref && (
-        <Reveal delay={0.1}>
-          <div className="mt-6 hidden justify-center sm:mt-10 lg:flex">
-            <Link
-              href={ctaHref}
-              className="btn-accent px-11 py-3.5 text-center text-sm"
+      {/* Desktop: horizontal carousel */}
+      {!empty ? (
+        <div className="relative hidden lg:block">
+          <RevealStagger>
+            <div
+              ref={scroller}
+              className="snap-x-mandatory -mx-2 flex gap-5 overflow-x-auto px-2 pb-4 pt-2 scrollbar-none"
+              style={{ scrollbarWidth: "none" }}
             >
-              {ctaLabel}
-            </Link>
-          </div>
-        </Reveal>
-      )}
+              {products.map((p) => (
+                <RevealItem
+                  key={p._id}
+                  className="snap-start w-[272px] shrink-0 xl:w-[300px]"
+                >
+                  <ProductCard product={p} />
+                </RevealItem>
+              ))}
+            </div>
+          </RevealStagger>
+        </div>
+      ) : null}
+
+      {!empty && ctaLabel && ctaHref ? (
+        <div className="mt-7 flex justify-center lg:hidden">
+          <Link href={ctaHref} className="btn-ghost w-full px-8 py-3 text-[11px]">
+            {ctaLabel}
+            <span className="btn-arrow" aria-hidden>
+              →
+            </span>
+          </Link>
+        </div>
+      ) : null}
     </section>
   );
 }

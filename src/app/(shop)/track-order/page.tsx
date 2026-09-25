@@ -76,7 +76,7 @@ function TrackInner() {
 
   return (
     <div className="mx-auto max-w-lg px-4 py-12">
-      <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold uppercase">
+      <h1 className="font-[family-name:var(--font-heavy)] text-4xl leading-[0.95] tracking-tight uppercase sm:text-5xl">
         Track order
       </h1>
       <p className="mt-2 text-sm text-[var(--moss)]">
@@ -84,14 +84,14 @@ function TrackInner() {
       </p>
       <form onSubmit={lookup} className="mt-6 space-y-3">
         <input
-          className="w-full rounded-md border-2 border-[var(--ink)] px-3 py-3 text-sm shadow-[2px_2px_0_0_var(--ink)]"
+          className="w-full rounded-2xl border border-[var(--ink)]/12 px-3 py-3 text-sm"
           placeholder="Order number (GR…)"
           value={order}
           onChange={(e) => setOrder(e.target.value)}
           required
         />
         <input
-          className="w-full rounded-md border-2 border-[var(--ink)] px-3 py-3 text-sm shadow-[2px_2px_0_0_var(--ink)]"
+          className="w-full rounded-2xl border border-[var(--ink)]/12 px-3 py-3 text-sm"
           placeholder="Phone used at checkout"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
@@ -106,7 +106,7 @@ function TrackInner() {
         <p className="mt-3 text-sm font-semibold text-[var(--moss)]">{cancelNote}</p>
       ) : null}
       {data ? (
-        <div className="mt-8 rounded-md border-2 border-[var(--ink)] bg-white p-5 shadow-[4px_4px_0_0_var(--ink)]">
+        <div className="mt-8 rounded-2xl border border-[var(--ink)]/12 bg-white p-5">
           <p className="text-xs font-extrabold uppercase text-[var(--moss)]">
             {data.orderNumber}
           </p>
@@ -139,7 +139,7 @@ function TrackInner() {
               type="button"
               disabled={busy}
               onClick={() => void cancel()}
-              className="mt-5 w-full rounded-md border-2 border-[var(--ink)] py-2.5 text-xs font-extrabold uppercase"
+              className="mt-5 w-full rounded-2xl border border-[var(--ink)]/12 py-2.5 text-xs font-extrabold uppercase"
             >
               Cancel order
             </button>

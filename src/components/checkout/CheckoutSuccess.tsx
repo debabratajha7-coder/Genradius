@@ -77,7 +77,7 @@ export function CheckoutSuccess() {
       <p className="text-[11px] font-extrabold tracking-[0.2em] text-[var(--moss)] uppercase">
         Genradius
       </p>
-      <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-extrabold uppercase">
+      <h1 className="mt-2 font-[family-name:var(--font-heavy)] text-4xl leading-[0.95] tracking-tight uppercase sm:text-5xl">
         {failed
           ? "Payment didn’t go through"
           : prepaidPending
@@ -127,7 +127,7 @@ export function CheckoutSuccess() {
         </Link>
         <Link
           href={`/track-order${orderId ? `?order=${encodeURIComponent(orderId)}` : ""}`}
-          className="rounded-md border-2 border-[var(--ink)] bg-white px-6 py-3 text-sm font-extrabold uppercase shadow-[3px_3px_0_0_var(--ink)]"
+          className="rounded-2xl border border-[var(--ink)]/12 bg-white px-6 py-3 text-sm font-extrabold uppercase"
         >
           Track order
         </Link>

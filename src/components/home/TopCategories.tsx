@@ -1,98 +1,77 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { CategoryLean } from "@/types/catalog";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 
-function CategoryPopCard({
+function CategoryTile({
   cat,
-  size = "md",
+  index,
 }: {
   cat: CategoryLean;
-  size?: "sm" | "md";
+  index: number;
 }) {
-  const isSm = size === "sm";
-
   return (
     <Link
       href={`/shop/${cat.slug}`}
-      className={`group flex shrink-0 flex-col items-center ${
-        isSm ? "w-[4.25rem]" : "w-full max-w-[160px] justify-self-center"
-      }`}
+      className="group relative flex shrink-0 flex-col overflow-hidden rounded-[18px] border border-[var(--border)] bg-white transition duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-[var(--ink)]/30 hover:shadow-[var(--shadow-lift)] sm:rounded-[22px]"
     >
-      <div
-        className={`relative w-full overflow-visible ${
-          isSm ? "h-[5.25rem]" : "h-[200px] xl:h-[220px]"
-        }`}
-      >
-        <div
-          className={`absolute right-0 bottom-0 left-0 border border-[#a8cfe6]/70 ${
-            isSm
-              ? "top-[0.85rem] rounded-t-[1.35rem] rounded-b-md"
-              : "top-[1.75rem] rounded-t-[2rem] rounded-b-xl"
-          }`}
-          style={{
-            background:
-              "linear-gradient(180deg, #c5e8f7 0%, #dff0f8 40%, #ffffff 100%)",
-            boxShadow: "0 4px 12px rgba(42, 41, 30, 0.08)",
-          }}
+      <div className="relative aspect-[4/5] overflow-hidden bg-[var(--surface)]">
+        <div className="bg-dots absolute inset-0 opacity-60" aria-hidden />
+        <Image
+          src={cat.image}
+          alt={cat.name}
+          fill
+          className="object-contain object-bottom p-3 transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06] sm:p-5"
+          sizes="(max-width:1023px) 40vw, 220px"
         />
-
-        {/* Full logo/image shrunk to fit — not cropped */}
-        <div className="absolute inset-x-[6%] top-0 bottom-[4%] z-10 flex items-end justify-center">
-          <div
-            className={`relative w-full drop-shadow-[0_6px_12px_rgba(42,41,30,0.16)] ${
-              isSm ? "h-full" : "h-full"
-            }`}
-          >
-            <Image
-              src={cat.image}
-              alt={cat.name}
-              fill
-              className="object-contain object-bottom transition duration-500 group-hover:scale-[1.04] group-active:scale-[0.98]"
-              sizes={isSm ? "68px" : "160px"}
-            />
-          </div>
-        </div>
+        <span className="absolute top-2.5 left-3 font-[family-name:var(--font-display)] text-[10px] font-extrabold tracking-[0.2em] text-[var(--olive)]">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <span className="icon-chip absolute right-2.5 bottom-2.5 h-8 w-8 text-sm opacity-0 transition duration-500 group-hover:opacity-100">
+          →
+        </span>
       </div>
-
-      <p
-        className={`mt-1.5 line-clamp-2 text-center font-extrabold tracking-[0.06em] text-[var(--ink)] uppercase ${
-          isSm ? "text-[8px] leading-tight" : "text-[10px] leading-snug xl:text-xs"
-        }`}
-      >
-        {cat.name}
-      </p>
+      <div className="flex items-center justify-between gap-2 px-3 py-2.5 sm:px-4 sm:py-3.5">
+        <p className="min-w-0 truncate font-[family-name:var(--font-heavy)] text-base leading-none tracking-wide text-[var(--ink)] uppercase sm:text-[17px]">
+          {cat.name}
+        </p>
+        <span className="hidden shrink-0 text-[10px] font-bold tracking-[0.14em] text-[var(--muted)] uppercase xl:inline">
+          Shop
+        </span>
+      </div>
     </Link>
   );
 }
 
 export function TopCategories({ categories }: { categories: CategoryLean[] }) {
   const tiles = categories.slice(0, 6);
-  const desktopTiles = categories.slice(0, 4);
+  if (!tiles.length) return null;
 
   return (
-    <section className="mx-auto max-w-[1400px] px-3 py-4 sm:px-6 sm:py-8">
-      <div className="section-heading">
-        <h2 className="section-title">Top Categories</h2>
-        <Link
-          href="/shop"
-          className="shrink-0 pb-1 text-[10px] font-extrabold tracking-wider text-[var(--moss)] uppercase underline-offset-2 hover:underline sm:text-xs"
-        >
-          Explore all
-        </Link>
-      </div>
+    <section className="relative mx-auto max-w-[1400px] px-3 py-8 sm:px-6 sm:py-16">
+      <SectionHeading
+        index="01 — Categories"
+        title={
+          <>
+            Pick your <em>lane</em>
+          </>
+        }
+        subtitle="Six edits, zero filler. Start where your wardrobe is weakest."
+        href="/shop"
+        linkLabel="Shop everything"
+      />
 
       <div
-        className="flex gap-2.5 overflow-x-auto overflow-y-visible pb-1 pt-0.5 scrollbar-none lg:hidden"
+        className="-mx-3 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-3 pb-2 scrollbar-none lg:mx-0 lg:grid lg:grid-cols-6 lg:gap-4 lg:overflow-visible lg:px-0"
         style={{ scrollbarWidth: "none" }}
       >
-        {tiles.map((cat) => (
-          <CategoryPopCard key={cat._id} cat={cat} size="sm" />
-        ))}
-      </div>
-
-      <div className="hidden grid-cols-4 items-end gap-5 overflow-visible pt-1 lg:grid xl:gap-8">
-        {desktopTiles.map((cat) => (
-          <CategoryPopCard key={cat._id} cat={cat} size="md" />
+        {tiles.map((cat, i) => (
+          <div
+            key={cat._id}
+            className="w-[42vw] shrink-0 snap-start sm:w-[220px] lg:w-auto"
+          >
+            <CategoryTile cat={cat} index={i} />
+          </div>
         ))}
       </div>
     </section>

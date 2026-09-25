@@ -89,20 +89,20 @@ export default function AccountPage() {
   }
 
   const tile =
-    "flex flex-col gap-1 rounded-md border-2 border-[var(--ink)] bg-[var(--background)] p-4 text-left shadow-[3px_3px_0_0_var(--ink)] transition hover:bg-[var(--accent-soft)] active:translate-x-px active:translate-y-px active:shadow-[2px_2px_0_0_var(--ink)]";
+    "flex flex-col gap-1 rounded-2xl border border-[var(--ink)]/12 bg-[var(--background)] p-4 text-left transition hover:bg-[var(--surface)] active:scale-[0.99]";
 
   return (
     <FadeIn className="mx-auto max-w-2xl px-3 py-5 sm:px-4 sm:py-14">
       {/* Profile */}
-      <div className="rounded-md border-2 border-[var(--ink)] bg-white p-6 shadow-[6px_6px_0_0_var(--ink)] sm:p-8">
+      <div className="rounded-2xl border border-[var(--ink)]/12 bg-white p-6 sm:p-8">
         <p className="text-[11px] font-extrabold tracking-[0.2em] text-[var(--moss)] uppercase">
           Your radius
         </p>
-        <h1 className="mt-2 font-[family-name:var(--font-display)] text-3xl font-extrabold uppercase">
+        <h1 className="mt-2 font-[family-name:var(--font-heavy)] text-4xl leading-[0.95] tracking-tight uppercase sm:text-5xl">
           Account
         </h1>
         <div className="mt-5 flex flex-wrap items-center gap-3">
-          <span className="rounded-md border-2 border-[var(--ink)] bg-[var(--sand)] px-3 py-1.5 text-xs font-extrabold tracking-wider uppercase shadow-[2px_2px_0_0_var(--ink)]">
+          <span className="rounded-full bg-[var(--pop)] px-3 py-1.5 text-[11px] font-black tracking-wider text-[var(--pop-ink)] uppercase">
             Member
           </span>
           <p className="text-sm">
@@ -178,7 +178,7 @@ export default function AccountPage() {
       {/* Orders */}
       <section
         id="orders"
-        className="mt-6 scroll-mt-24 rounded-md border-2 border-[var(--ink)] bg-white p-5 shadow-[4px_4px_0_0_var(--ink)] sm:p-6"
+        className="mt-6 scroll-mt-24 rounded-2xl border border-[var(--ink)]/12 bg-white p-5 sm:p-6"
       >
         <div className="flex items-baseline justify-between gap-3">
           <h2 className="font-[family-name:var(--font-display)] text-lg font-extrabold tracking-wide uppercase">
@@ -188,7 +188,7 @@ export default function AccountPage() {
             0 active
           </span>
         </div>
-        <div className="mt-4 rounded-md border border-dashed border-[var(--ink)]/35 bg-[var(--accent-soft)]/50 px-4 py-8 text-center">
+        <div className="mt-4 rounded-2xl border border-dashed border-[var(--ink)]/35 bg-[var(--accent-soft)]/50 px-4 py-8 text-center">
           <p className="text-sm font-semibold">No orders yet</p>
           <p className="mt-1 text-xs text-[var(--moss)]">
             When you checkout, tracking and invoices will show up here.
@@ -198,7 +198,7 @@ export default function AccountPage() {
           </Link>
         </div>
         {items.length > 0 && (
-          <div className="mt-4 flex flex-col gap-2 rounded-md border-2 border-[var(--ink)] bg-[var(--sand)]/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-4 flex flex-col gap-2 rounded-2xl border border-[var(--ink)]/12 bg-[var(--surface)] p-4 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm">
               You have <span className="font-bold">{count}</span> item
               {count === 1 ? "" : "s"} in your bag (
@@ -218,7 +218,7 @@ export default function AccountPage() {
       {/* Addresses — managed at /account/addresses (server-backed) */}
       <section
         id="addresses"
-        className="mt-6 scroll-mt-24 rounded-md border-2 border-[var(--ink)] bg-white p-5 shadow-[4px_4px_0_0_var(--ink)] sm:p-6"
+        className="mt-6 scroll-mt-24 rounded-2xl border border-[var(--ink)]/12 bg-white p-5 sm:p-6"
       >
         <div className="flex items-center justify-between gap-3">
           <h2 className="font-[family-name:var(--font-display)] text-lg font-extrabold tracking-wide uppercase">
@@ -246,7 +246,7 @@ export default function AccountPage() {
       {/* Wishlist */}
       <section
         id="wishlist"
-        className="mt-6 scroll-mt-24 rounded-md border-2 border-[var(--ink)] bg-white p-5 shadow-[4px_4px_0_0_var(--ink)] sm:p-6"
+        className="mt-6 scroll-mt-24 rounded-2xl border border-[var(--ink)]/12 bg-white p-5 sm:p-6"
       >
         <h2 className="font-[family-name:var(--font-display)] text-lg font-extrabold tracking-wide uppercase">
           Wishlist
@@ -267,7 +267,7 @@ export default function AccountPage() {
       {/* Help */}
       <section
         id="help"
-        className="mt-6 scroll-mt-24 rounded-md border-2 border-[var(--ink)] bg-white p-5 shadow-[4px_4px_0_0_var(--ink)] sm:p-6"
+        className="mt-6 scroll-mt-24 rounded-2xl border border-[var(--ink)]/12 bg-white p-5 sm:p-6"
       >
         <h2 className="font-[family-name:var(--font-display)] text-lg font-extrabold tracking-wide uppercase">
           Help & support
@@ -295,7 +295,7 @@ export default function AccountPage() {
       </section>
 
       {/* Profile + logout */}
-      <section className="mt-6 rounded-md border-2 border-[var(--ink)] bg-[var(--sand)]/35 p-5 shadow-[4px_4px_0_0_var(--ink)] sm:p-6">
+      <section className="mt-6 rounded-2xl border border-[var(--ink)]/12 bg-white/60 p-5 sm:p-6">
         <h2 className="font-[family-name:var(--font-display)] text-lg font-extrabold tracking-wide uppercase">
           Profile
         </h2>
@@ -344,7 +344,7 @@ export default function AccountPage() {
           </Link>
           <button
             type="button"
-            className="flex-1 rounded-md border-2 border-[var(--ink)] bg-white px-5 py-3 text-sm font-extrabold tracking-wider uppercase shadow-[3px_3px_0_0_var(--ink)]"
+            className="flex-1 rounded-2xl border border-[var(--ink)]/12 bg-white px-5 py-3 text-sm font-extrabold tracking-wider uppercase"
             onClick={async () => {
               await logout();
               router.push("/");

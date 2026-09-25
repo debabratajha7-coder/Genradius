@@ -59,7 +59,23 @@ export default async function ProductPage({ params }: Props) {
     <>
       <ProductJsonLd product={product} />
       <ProductPurchase product={product} />
-      <ProductCarousel title="You might also flex" products={related} />
+      <ProductCarousel
+        title="You might also flex"
+        index="Complete the fit"
+        heading={
+          <>
+            Wear it <em>with</em>
+          </>
+        }
+        subtitle="Pieces from the same lane that pair without trying."
+        products={related}
+        ctaLabel="Shop the category"
+        ctaHref={
+          product.categorySlugs[0]
+            ? `/shop/${product.categorySlugs[0]}`
+            : "/shop"
+        }
+      />
     </>
   );
 }

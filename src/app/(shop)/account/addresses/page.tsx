@@ -19,7 +19,7 @@ type Addr = {
 };
 
 const field =
-  "w-full rounded-md border-2 border-[var(--ink)] bg-white px-3 py-2 text-sm shadow-[2px_2px_0_0_var(--ink)]";
+  "w-full rounded-2xl border border-[var(--ink)]/12 bg-white px-3 py-2 text-sm";
 
 export default function AddressesPage() {
   const { user, loading } = useAuth();
@@ -89,7 +89,7 @@ export default function AddressesPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10">
-      <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold uppercase">
+      <h1 className="font-[family-name:var(--font-heavy)] text-4xl leading-[0.95] tracking-tight uppercase sm:text-5xl">
         Addresses
       </h1>
       <p className="mt-2 text-sm text-[var(--moss)]">
@@ -99,7 +99,7 @@ export default function AddressesPage() {
         {addresses.map((a) => (
           <li
             key={a.id}
-            className="rounded-md border-2 border-[var(--ink)] bg-white p-4 shadow-[3px_3px_0_0_var(--ink)]"
+            className="rounded-2xl border border-[var(--ink)]/12 bg-white p-4"
           >
             <p className="text-xs font-extrabold uppercase text-[var(--moss)]">
               {a.label}
@@ -146,7 +146,7 @@ export default function AddressesPage() {
         ))}
       </ul>
 
-      <form onSubmit={add} className="mt-8 space-y-3 rounded-md border-2 border-[var(--ink)] p-4">
+      <form onSubmit={add} className="mt-8 space-y-3 rounded-2xl border border-[var(--ink)]/12 p-4">
         <h2 className="text-sm font-extrabold uppercase">Add address</h2>
         {error ? <p className="text-sm text-red-700">{error}</p> : null}
         <input

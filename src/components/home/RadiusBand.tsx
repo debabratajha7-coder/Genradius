@@ -2,6 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import type { HomeMediaLean } from "@/lib/home-media-defaults";
 import { DEFAULT_HOME_MEDIA } from "@/lib/home-media-defaults";
+import { Marquee } from "@/components/ui/Marquee";
+
+const STATS = [
+  { value: "EST. 2026", label: "Born in the circle" },
+  { value: "16+", label: "Drops and counting" },
+  { value: "48h", label: "Average dispatch" },
+];
 
 export function RadiusBand({
   media = DEFAULT_HOME_MEDIA,
@@ -11,180 +18,140 @@ export function RadiusBand({
   const collage = [
     {
       src: media.aboutCollage[0],
-      className: "absolute top-0 left-4 w-44 rotate-[-8deg]",
+      className: "left-0 top-[2%] w-[58%] -rotate-[7deg]",
     },
     {
       src: media.aboutCollage[1],
-      className: "absolute top-4 right-2 w-44 rotate-[6deg]",
+      className: "right-0 top-[28%] w-[60%] rotate-[5deg]",
     },
     {
       src: media.aboutCollage[2],
-      className: "absolute bottom-0 left-1/4 w-48 rotate-[3deg]",
+      className: "left-[16%] bottom-[3%] w-[62%] rotate-[2deg]",
     },
   ];
 
   return (
-    <section id="about" className="relative overflow-hidden">
-      {/* Phone: single inset promo banner */}
-      <div className="px-3 py-4 lg:hidden">
-        <Link
-          href="/shop"
-          className="relative block overflow-hidden rounded-2xl"
-        >
-          <div className="relative aspect-[16/9] min-h-[140px]">
-            <Image
-              src={media.aboutPhoneBanner}
-              alt="The Radius"
-              fill
-              className="object-cover"
-              sizes="100vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[var(--moss)]/90 via-[var(--earth)]/70 to-transparent" />
-            <div className="absolute inset-0 flex flex-col justify-end p-4">
-              <p className="font-[family-name:var(--font-logo)] text-lg tracking-wide text-[var(--silver)] uppercase">
-                The Radius
-              </p>
-              <p className="mt-1 max-w-[220px] text-[11px] leading-snug text-white/85">
-                Streetwear for people who widen the circle.
-              </p>
-              <span className="btn-accent mt-3 w-fit rounded-md px-4 py-2 text-[10px]">
-                Shop the drop
+    <section id="about" className="relative overflow-hidden bg-[var(--ink-deep)] text-white">
+      <div className="bg-grid-dark absolute inset-0 opacity-60" aria-hidden />
+      <div className="orb orb--pop top-[-10%] left-[-8%] h-[38rem] w-[38rem] opacity-40" aria-hidden />
+      <div className="orb orb--sand right-[-12%] bottom-[-10%] h-[34rem] w-[34rem] opacity-40 [animation-delay:-9s]" aria-hidden />
+
+      {/* Giant word marquee */}
+      <div className="relative border-b border-white/10 py-3 sm:py-4">
+        <Marquee speed={46} flat>
+          {["Own your radius", "Widen the circle", "Zero blending in"].map(
+            (t, i) => (
+              <span
+                key={t}
+                className={`px-6 font-[family-name:var(--font-heavy)] text-[13vw] leading-none tracking-wide uppercase sm:text-[7vw] ${
+                  i % 2 ? "text-outline-light" : "text-white/90"
+                }`}
+              >
+                {t}
               </span>
-            </div>
-          </div>
-        </Link>
+            ),
+          )}
+        </Marquee>
       </div>
 
-      {/* Desktop: full brand story */}
-      <div className="hidden lg:block">
-        <div
-          className="px-6 py-20"
-          style={{
-            background:
-              "radial-gradient(ellipse at 20% 30%, #88986b 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, #443f20 0%, transparent 45%), #535539",
-          }}
-        >
-          <div className="mx-auto max-w-[1400px]">
-            <div className="grid grid-cols-2 items-center gap-12">
-              <div>
-                <span className="mb-4 inline-block -rotate-2 border border-[var(--ink)] bg-[var(--sand)] px-3 py-1 text-xs font-extrabold tracking-widest text-[var(--ink)] uppercase shadow-[2px_2px_0_0_var(--ink)]">
-                  Welcome to
-                </span>
-                <h2 className="font-[family-name:var(--font-logo)] text-7xl leading-none tracking-wide text-[var(--silver)] uppercase">
-                  The Radius
-                </h2>
+      <div className="relative mx-auto grid max-w-[1400px] gap-10 px-4 py-12 sm:px-6 sm:py-20 lg:grid-cols-12 lg:gap-14 lg:py-28">
+        {/* Copy */}
+        <div className="lg:col-span-6">
+          <p className="eyebrow text-[var(--pop)]">The Radius</p>
+          <h2 className="mt-4 font-[family-name:var(--font-heavy)] text-[clamp(2.6rem,9vw,4rem)] leading-[0.9] uppercase sm:text-[clamp(3.5rem,6vw,6rem)]">
+            We are
+            <br />
+            <span className="text-[var(--pop)]">explicit,</span>
+            <br />
+            <span className="text-outline-light">never loud.</span>
+          </h2>
+          <p className="mt-6 max-w-md text-sm leading-relaxed text-white/70 sm:text-base">
+            Genradius is for the ones who widen the circle — oversized graphics,
+            heavyweight basics and cargos that move with you. Original fits,
+            honest pricing, drops that don&apos;t wait for permission.
+          </p>
 
-                <div className="mt-8 flex flex-col gap-4">
-                  <div className="rounded-2xl border-2 border-[var(--ink)] bg-[var(--background)] px-5 py-4 shadow-[6px_6px_0_#be9c7d]">
-                    <p className="text-2xl font-extrabold text-[var(--olive)]">
-                      EST. 2026
-                    </p>
-                    <p className="text-sm font-bold tracking-wide uppercase">
-                      Of owning your lane
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border-2 border-[var(--ink)] bg-[var(--background)] px-5 py-4 shadow-[6px_6px_0_#be9c7d]">
-                    <p className="text-2xl font-extrabold text-[var(--olive)]">
-                      16+ DROPS
-                    </p>
-                    <p className="text-sm font-bold tracking-wide uppercase">
-                      Ready to flex
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative mx-auto w-full max-w-md">
-                <div className="rotate-3 overflow-hidden rounded-2xl border-4 border-white bg-black shadow-2xl">
-                  <div className="flex gap-1.5 bg-white px-3 py-2">
-                    <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-                  </div>
-                  <div className="relative aspect-[4/5]">
-                    {media.aboutVideoUrl ? (
-                      <video
-                        src={media.aboutVideoUrl}
-                        poster={media.aboutVideoPoster}
-                        className="absolute inset-0 h-full w-full object-cover"
-                        muted
-                        loop
-                        playsInline
-                        autoPlay
-                        preload="metadata"
-                      />
-                    ) : (
-                      <>
-                        <Image
-                          src={media.aboutVideoPoster}
-                          alt="Genradius crew"
-                          fill
-                          className="object-cover"
-                          sizes="400px"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-[var(--ink)] bg-[var(--sand)] text-xl font-bold shadow-[2px_2px_0_0_var(--ink)]">
-                            ▶
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Link href="/shop" className="btn-accent px-7 py-3.5 text-xs">
+              Shop the drop
+              <span className="btn-arrow" aria-hidden>
+                →
+              </span>
+            </Link>
+            <Link
+              href="/shop?collection=premium"
+              className="btn-light px-6 py-3.5 text-xs"
+            >
+              Premium edit
+            </Link>
           </div>
+
+          <dl className="mt-10 grid grid-cols-3 gap-4 border-t border-white/10 pt-6 sm:mt-14 sm:gap-8">
+            {STATS.map((s) => (
+              <div key={s.label}>
+                <dt className="font-[family-name:var(--font-heavy)] text-2xl leading-none tracking-wide text-white sm:text-4xl">
+                  {s.value}
+                </dt>
+                <dd className="mt-1.5 text-[10px] font-bold tracking-[0.16em] text-white/55 uppercase sm:text-[11px]">
+                  {s.label}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
 
-        <div className="bg-[var(--sand)] px-6 py-5">
-          <div className="mx-auto flex max-w-[1400px] items-baseline justify-between gap-3">
-            <p className="text-xl font-bold text-[var(--background)]">We are</p>
-            <div className="text-right">
-              <p className="font-[family-name:var(--font-display)] text-4xl font-extrabold tracking-wide text-[var(--ink)] uppercase">
-                explicit
-              </p>
-              <p className="text-sm font-medium text-[var(--earth)]">
-                But never assertive
+        {/* Media */}
+        <div className="grid gap-4 lg:col-span-6 lg:grid-cols-5 lg:gap-5">
+          <div className="relative overflow-hidden rounded-[22px] border border-white/10 bg-black lg:col-span-3">
+            <div className="relative aspect-[4/5] lg:aspect-auto lg:h-full lg:min-h-[540px]">
+              {media.aboutVideoUrl ? (
+                <video
+                  src={media.aboutVideoUrl}
+                  poster={media.aboutVideoPoster}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  muted
+                  loop
+                  playsInline
+                  autoPlay
+                  preload="metadata"
+                />
+              ) : (
+                <Image
+                  src={media.aboutVideoPoster || media.aboutPhoneBanner}
+                  alt="Genradius crew"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width:1023px) 100vw, 40vw"
+                />
+              )}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(23,22,15,0.7)] to-transparent" />
+              <span className="absolute top-4 left-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[9px] font-extrabold tracking-[0.2em] uppercase backdrop-blur-md">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--pop)]" />
+                On set
+              </span>
+              <p className="absolute right-4 bottom-4 left-4 font-[family-name:var(--font-heavy)] text-2xl leading-none uppercase sm:text-3xl">
+                Made for the
+                <br />
+                <span className="text-[var(--pop)]">outer ring.</span>
               </p>
             </div>
           </div>
-        </div>
 
-        <div className="bg-[var(--ink)] px-6 py-14">
-          <div className="mx-auto grid max-w-[1400px] grid-cols-2 items-center gap-10">
-            <div>
-              <h3 className="font-[family-name:var(--font-display)] text-4xl tracking-wide text-white uppercase">
-                About Us
-              </h3>
-              <p className="mt-4 max-w-md text-sm leading-relaxed text-white/85">
-                Genradius is for the ones who widen the circle — oversized
-                graphics, premium basics, and cargos that move with you. Loud
-                energy, original fits, zero blending in.
-              </p>
-              <Link
-                href="/shop"
-                className="btn-accent mt-6 inline-flex px-6 py-3 text-xs"
+          <div className="relative hidden min-h-[320px] lg:col-span-2 lg:block">
+            {collage.map((img) => (
+              <div
+                key={img.src + img.className}
+                className={`absolute ${img.className} aspect-[3/4] overflow-hidden rounded-[16px] border border-white/15 shadow-[0_30px_60px_rgba(0,0,0,0.45)] transition duration-700 hover:rotate-0 hover:scale-[1.04]`}
               >
-                Shop the drop
-              </Link>
-            </div>
-
-            <div className="relative mx-auto h-72 w-full max-w-lg">
-              {collage.map((img) => (
-                <div
-                  key={img.src + img.className}
-                  className={`relative ${img.className} aspect-[3/4] overflow-hidden rounded-xl border-2 border-white shadow-lg`}
-                >
-                  <Image
-                    src={img.src}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="200px"
-                  />
-                </div>
-              ))}
-            </div>
+                <Image
+                  src={img.src}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="200px"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
