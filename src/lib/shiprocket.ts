@@ -3,8 +3,7 @@ const API = "https://apiv2.shiprocket.in/v1/external";
 export function isShiprocketConfigured(): boolean {
   return Boolean(
     process.env.SHIPROCKET_EMAIL?.trim() &&
-      process.env.SHIPROCKET_PASSWORD?.trim() &&
-      process.env.SHIPROCKET_PICKUP_PINCODE?.trim(),
+      process.env.SHIPROCKET_PASSWORD?.trim(),
   );
 }
 
@@ -90,9 +89,20 @@ export async function createShiprocketOrder(opts: {
   items: { title: string; slug: string; qty: number; price: number }[];
   subtotal: number;
   weightKg: number;
-}): Promise<{ orderId: string; shipmentId: string }> {
+  paymentMethod?: "Prepaid" | "COD";
+  pickupLocation?: string;
+}): Promise<{
+  orderId: string;
+  shipmentId: string;
+  awb?: string;
+  courier?: string;
+}> {
   const tok = await token();
   const [first, ...rest] = opts.name.trim().split(/\s+/);
+  const pickup =
+    opts.pickupLocation ||
+    process.env.SHIPROCKET_PICKUP_LOCATION ||
+    "Primary";
   const res = await fetch(`${API}/orders/create/adhoc`, {
     method: "POST",
     headers: {
@@ -102,7 +112,7 @@ export async function createShiprocketOrder(opts: {
     body: JSON.stringify({
       order_id: opts.orderId,
       order_date: new Date().toISOString().slice(0, 16).replace("T", " "),
-      pickup_location: process.env.SHIPROCKET_PICKUP_LOCATION || "Primary",
+      pickup_location: pickup,
       billing_customer_name: first || opts.name,
       billing_last_name: rest.join(" ") || ".",
       billing_address: opts.address,
@@ -115,11 +125,11 @@ export async function createShiprocketOrder(opts: {
       shipping_is_billing: true,
       order_items: opts.items.map((item) => ({
         name: item.title,
-        sku: `${item.slug}-${item.qty}`,
+        sku: item.slug.slice(0, 40),
         units: item.qty,
         selling_price: item.price,
       })),
-      payment_method: "Prepaid",
+      payment_method: opts.paymentMethod || "Prepaid",
       sub_total: opts.subtotal,
       length: 25,
       breadth: 20,
@@ -130,13 +140,20 @@ export async function createShiprocketOrder(opts: {
   const data = (await res.json()) as {
     order_id?: number;
     shipment_id?: number;
-    message?: string;
+    awb_code?: string;
+    courier_name?: string;
+    message?: string | string[];
   };
   if (!res.ok || !data.order_id) {
-    throw new Error(data.message || "Shiprocket order failed");
+    const msg = Array.isArray(data.message)
+      ? data.message.join(", ")
+      : data.message;
+    throw new Error(msg || "Shiprocket order failed");
   }
   return {
     orderId: String(data.order_id),
     shipmentId: String(data.shipment_id || ""),
+    awb: data.awb_code || "",
+    courier: data.courier_name || "",
   };
 }

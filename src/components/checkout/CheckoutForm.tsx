@@ -10,27 +10,77 @@ import { formatINR } from "@/lib/format";
 const field =
   "w-full rounded-md border-2 border-[var(--ink)] bg-white px-3 py-3 text-sm shadow-[2px_2px_0_0_var(--ink)] outline-none";
 
+type Settings = {
+  freeShippingThreshold: number;
+  shippingFee: number;
+  codFee: number;
+  codEnabled: boolean;
+  codOtpRequired: boolean;
+};
+
 export function CheckoutForm() {
-  const { items, subtotal } = useCart();
+  const { items, subtotal, clearCart } = useCart();
+  const [settings, setSettings] = useState<Settings | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"prepaid" | "cod">(
+    "prepaid",
+  );
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
+  const [line2, setLine2] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [pincode, setPincode] = useState("");
-  const [shipping, setShipping] = useState<number | null>(null);
+  const [shippingFee, setShippingFee] = useState<number | null>(null);
+  const [codFee, setCodFee] = useState(0);
   const [courier, setCourier] = useState("");
   const [etd, setEtd] = useState("");
   const [quoteNote, setQuoteNote] = useState("");
+  const [codOtp, setCodOtp] = useState("");
+  const [otpHint, setOtpHint] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    void fetch("/api/settings")
+      .then((r) => r.json())
+      .then((s: Settings) => {
+        setSettings(s);
+        if (!s.codEnabled) setPaymentMethod("prepaid");
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    void fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then(async (data) => {
+        if (!data.user) return;
+        if (data.user.name) setName(data.user.name);
+        if (data.user.email) setEmail(data.user.email);
+        if (data.user.phone) setPhone(data.user.phone.replace(/^\+91/, ""));
+        const addrRes = await fetch("/api/account/addresses");
+        if (!addrRes.ok) return;
+        const { addresses } = await addrRes.json();
+        const def =
+          addresses?.find((a: { isDefault?: boolean }) => a.isDefault) ||
+          addresses?.[0];
+        if (!def) return;
+        setName(def.fullName || "");
+        setPhone(String(def.phone || "").replace(/^\+91/, ""));
+        setAddress(def.line1 || "");
+        setLine2(def.line2 || "");
+        setCity(def.city || "");
+        setState(def.state || "");
+        setPincode(def.pincode || "");
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (!/^\d{6}$/.test(pincode) || !items.length) {
-      setShipping(null);
-      setCourier("");
-      setEtd("");
+      setShippingFee(null);
       return;
     }
     const ctrl = new AbortController();
@@ -42,6 +92,7 @@ export function CheckoutForm() {
           signal: ctrl.signal,
           body: JSON.stringify({
             pincode,
+            paymentMethod,
             items: items.map((i) => ({
               productId: i.productId,
               slug: i.slug,
@@ -52,13 +103,22 @@ export function CheckoutForm() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "No shipping quote");
-        setShipping(Number(data.amount) || 0);
+        setShippingFee(Number(data.shippingFee) || 0);
+        setCodFee(Number(data.codFee) || 0);
         setCourier(data.courier || "");
         setEtd(data.etd || "");
-        setQuoteNote("Free shipping on all orders.");
+        if (data.freeShipping) {
+          setQuoteNote("Free shipping unlocked — Own Your Radius.");
+        } else if (data.remainingForFree > 0) {
+          setQuoteNote(
+            `Add ${formatINR(data.remainingForFree)} more for free shipping.`,
+          );
+        } else {
+          setQuoteNote("");
+        }
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
-        setShipping(null);
+        setShippingFee(null);
         setQuoteNote(err instanceof Error ? err.message : "Shipping unavailable");
       }
     }, 400);
@@ -66,12 +126,31 @@ export function CheckoutForm() {
       clearTimeout(timer);
       ctrl.abort();
     };
-  }, [pincode, items]);
+  }, [pincode, items, paymentMethod]);
+
+  async function sendCodOtp() {
+    setError("");
+    setOtpHint("");
+    const res = await fetch("/api/checkout/cod-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "OTP failed");
+    setOtpHint(data.message || "OTP sent");
+  }
 
   async function pay() {
     setBusy(true);
     setError("");
     try {
+      if (paymentMethod === "cod" && settings?.codOtpRequired && !codOtp) {
+        await sendCodOtp();
+        setBusy(false);
+        setError("Enter the OTP we sent, then place the order again.");
+        return;
+      }
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,9 +159,12 @@ export function CheckoutForm() {
           phone,
           email,
           address,
+          line2,
           city,
           state,
           pincode,
+          paymentMethod,
+          codOtp: paymentMethod === "cod" ? codOtp : undefined,
           items: items.map((i) => ({
             productId: i.productId,
             slug: i.slug,
@@ -93,6 +175,7 @@ export function CheckoutForm() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Checkout failed");
+      clearCart();
       window.location.href = data.redirectUrl;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Checkout failed");
@@ -113,7 +196,7 @@ export function CheckoutForm() {
     );
   }
 
-  const total = subtotal + (shipping ?? 0);
+  const total = subtotal + (shippingFee ?? 0) + codFee;
 
   return (
     <div className="mx-auto grid max-w-5xl gap-8 px-4 py-8 lg:grid-cols-[1.1fr_0.9fr] lg:py-14">
@@ -128,11 +211,39 @@ export function CheckoutForm() {
           Checkout
         </p>
         <h1 className="font-[family-name:var(--font-display)] text-3xl font-extrabold uppercase">
-          Delivery details
+          Delivery & payment
         </h1>
-        <p className="text-sm text-[var(--moss)]">
-          We’ll take payment securely, then book Shiprocket delivery to this address.
-        </p>
+
+        <fieldset className="space-y-2 rounded-md border-2 border-[var(--ink)] bg-white p-4 shadow-[3px_3px_0_0_var(--ink)]">
+          <legend className="px-1 text-xs font-extrabold uppercase">
+            Pay how?
+          </legend>
+          <label className="flex cursor-pointer items-center gap-3 text-sm font-semibold">
+            <input
+              type="radio"
+              name="pay"
+              checked={paymentMethod === "prepaid"}
+              onChange={() => setPaymentMethod("prepaid")}
+            />
+            Pay online
+          </label>
+          {settings?.codEnabled ? (
+            <label className="flex cursor-pointer items-center gap-3 text-sm font-semibold">
+              <input
+                type="radio"
+                name="pay"
+                checked={paymentMethod === "cod"}
+                onChange={() => setPaymentMethod("cod")}
+              />
+              Cash on delivery
+              {settings.codFee > 0 ? (
+                <span className="text-xs text-[var(--moss)]">
+                  (+{formatINR(settings.codFee)} COD fee)
+                </span>
+              ) : null}
+            </label>
+          ) : null}
+        </fieldset>
 
         <label className="block space-y-1 text-xs font-extrabold uppercase">
           Full name
@@ -143,11 +254,10 @@ export function CheckoutForm() {
             Phone
             <input
               required
-              inputMode="tel"
               className={field}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="98765 43210"
+              placeholder="10-digit mobile"
             />
           </label>
           <label className="block space-y-1 text-xs font-extrabold uppercase">
@@ -162,15 +272,12 @@ export function CheckoutForm() {
           </label>
         </div>
         <label className="block space-y-1 text-xs font-extrabold uppercase">
-          Address
-          <textarea
-            required
-            rows={3}
-            className={field}
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="House, street, landmark"
-          />
+          Address line 1
+          <input required className={field} value={address} onChange={(e) => setAddress(e.target.value)} />
+        </label>
+        <label className="block space-y-1 text-xs font-extrabold uppercase">
+          Address line 2 (optional)
+          <input className={field} value={line2} onChange={(e) => setLine2(e.target.value)} />
         </label>
         <div className="grid gap-4 sm:grid-cols-3">
           <label className="block space-y-1 text-xs font-extrabold uppercase">
@@ -185,7 +292,7 @@ export function CheckoutForm() {
               value={state}
               onChange={(e) => setState(e.target.value)}
             >
-              <option value="">Select</option>
+              <option value="">Select…</option>
               {INDIAN_STATES.map((s) => (
                 <option key={s} value={s}>
                   {s}
@@ -205,14 +312,48 @@ export function CheckoutForm() {
             />
           </label>
         </div>
+
+        {paymentMethod === "cod" && settings?.codOtpRequired ? (
+          <div className="space-y-2 rounded-md border-2 border-[var(--ink)] bg-[var(--sand)]/40 p-3">
+            <div className="flex flex-wrap gap-2">
+              <input
+                className={`${field} max-w-[10rem]`}
+                value={codOtp}
+                onChange={(e) => setCodOtp(e.target.value)}
+                placeholder="COD OTP"
+                inputMode="numeric"
+              />
+              <button
+                type="button"
+                className="rounded-md border-2 border-[var(--ink)] bg-white px-3 py-2 text-xs font-extrabold uppercase"
+                onClick={() => void sendCodOtp().catch((e) => setError(e.message))}
+              >
+                Send OTP
+              </button>
+            </div>
+            {otpHint ? <p className="text-xs text-[var(--moss)]">{otpHint}</p> : null}
+          </div>
+        ) : null}
+        {paymentMethod === "cod" && settings && !settings.codOtpRequired ? (
+          <p className="text-xs text-[var(--moss)]">
+            COD without SMS verification (Twilio not configured).
+          </p>
+        ) : null}
+
         {quoteNote && <p className="text-xs text-[var(--moss)]">{quoteNote}</p>}
         {error && <p className="text-sm font-semibold text-red-700">{error}</p>}
-        <button type="submit" disabled={busy || shipping == null} className="btn-accent w-full py-3.5 text-sm">
+        <button
+          type="submit"
+          disabled={busy || shippingFee == null}
+          className="btn-accent w-full py-3.5 text-sm"
+        >
           {busy
             ? "Processing…"
-            : shipping == null
+            : shippingFee == null
               ? "Enter pincode for shipping"
-              : `Pay ${formatINR(total)}`}
+              : paymentMethod === "cod"
+                ? `Place COD order · ${formatINR(total)}`
+                : `Pay ${formatINR(total)}`}
         </button>
       </form>
 
@@ -244,20 +385,26 @@ export function CheckoutForm() {
               Shipping{courier ? ` · ${courier}` : ""}
             </dt>
             <dd className="font-bold">
-              {shipping == null
+              {shippingFee == null
                 ? "—"
-                : shipping === 0
+                : shippingFee === 0
                   ? "Free"
-                  : formatINR(shipping)}
+                  : formatINR(shippingFee)}
             </dd>
           </div>
+          {codFee > 0 ? (
+            <div className="flex justify-between">
+              <dt className="text-[var(--moss)]">COD fee</dt>
+              <dd className="font-bold">{formatINR(codFee)}</dd>
+            </div>
+          ) : null}
           {etd && (
             <p className="text-xs text-[var(--moss)]">Estimated delivery {etd}</p>
           )}
           <div className="flex justify-between text-base">
             <dt className="font-extrabold uppercase">Total</dt>
             <dd className="font-extrabold">
-              {shipping == null ? "—" : formatINR(total)}
+              {shippingFee == null ? "—" : formatINR(total)}
             </dd>
           </div>
         </dl>

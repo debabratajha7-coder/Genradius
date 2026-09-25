@@ -54,7 +54,7 @@ const ACCOUNT_LINKS = [
   },
   {
     label: "Addresses",
-    href: "/account#addresses",
+    href: "/account/addresses",
     hint: "Delivery spots",
     icon: "⌖",
   },

@@ -1,11 +1,14 @@
-import type { Metadata } from "next";
-import { CheckoutReturn } from "@/components/checkout/CheckoutReturn";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Order status",
-  robots: { index: false, follow: false },
-};
+type Props = { searchParams: Promise<{ order?: string; order_id?: string }> };
 
-export default function CheckoutReturnPage() {
-  return <CheckoutReturn />;
+/** Legacy PhonePe return URL — forwards to /checkout/success. */
+export default async function CheckoutReturnPage({ searchParams }: Props) {
+  const sp = await searchParams;
+  const id = sp.order_id || sp.order || "";
+  redirect(
+    id
+      ? `/checkout/success?order_id=${encodeURIComponent(id)}`
+      : "/checkout/success",
+  );
 }

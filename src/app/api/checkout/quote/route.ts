@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
+import {
+  computeCheckoutTotals,
+  getCheckoutSettings,
+} from "@/lib/site-settings";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { priceCart, type CheckoutItemInput } from "@/lib/orders";
 import { isShiprocketConfigured, quoteShipping } from "@/lib/shiprocket";
-import { priceCart, weightKg, type CheckoutItemInput } from "@/lib/orders";
+import { weightKg } from "@/lib/orders";
 
 export async function POST(req: Request) {
   const limited = rateLimit({
@@ -17,6 +22,8 @@ export async function POST(req: Request) {
     const body = (await req.json()) as {
       pincode?: string;
       items?: CheckoutItemInput[];
+      paymentMethod?: "prepaid" | "cod";
+      subtotal?: number;
     };
     const pincode = String(body.pincode || "").replace(/\D/g, "");
     if (!/^\d{6}$/.test(pincode)) {
@@ -28,24 +35,42 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: priced.error }, { status: 400 });
     }
 
-    // Free shipping — no auto charge (Shiprocket still used later for booking only)
-    if (!isShiprocketConfigured()) {
-      return NextResponse.json({
-        amount: 0,
-        courier: "Standard",
-        etd: "",
-        fallback: true,
-      });
+    const settings = await getCheckoutSettings();
+    const method = body.paymentMethod === "cod" ? "cod" : "prepaid";
+    const fees = computeCheckoutTotals(priced.subtotal, method, settings);
+
+    let courier = "Standard";
+    let etd = "";
+    if (isShiprocketConfigured()) {
+      try {
+        const quote = await quoteShipping({
+          deliveryPincode: pincode,
+          weightKg: weightKg(priced.items),
+        });
+        courier = quote.courier;
+        etd = quote.etd;
+      } catch {
+        /* keep defaults */
+      }
     }
 
-    const quote = await quoteShipping({
-      deliveryPincode: pincode,
-      weightKg: weightKg(priced.items),
-    });
+    const remainingForFree = Math.max(
+      0,
+      settings.freeShippingThreshold - priced.subtotal,
+    );
+
     return NextResponse.json({
-      ...quote,
-      amount: 0,
-      fallback: false,
+      amount: fees.shippingFee,
+      shippingFee: fees.shippingFee,
+      codFee: fees.codFee,
+      total: fees.total,
+      subtotal: priced.subtotal,
+      courier,
+      etd,
+      freeShippingThreshold: settings.freeShippingThreshold,
+      remainingForFree,
+      freeShipping: fees.shippingFee === 0,
+      fallback: !isShiprocketConfigured(),
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Shipping quote failed";

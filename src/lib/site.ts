@@ -18,5 +18,4 @@ export const SITE = {
   email: "info@genradius.in",
   phone: "+917074890060",
   phoneDisplay: "70748 90060",
-  contactName: "Debjyoti Pandit",
 } as const;

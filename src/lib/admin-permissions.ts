@@ -28,6 +28,7 @@ export const PERMISSION_BY_PATH: Record<string, AdminPermissionId> = {
   "/admin/customers": "customers",
   "/admin/notify": "notify",
   "/admin/orders": "orders",
+  "/admin/settings": "orders",
   "/admin/team": "team",
 };
 

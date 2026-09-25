@@ -32,12 +32,24 @@ Men's streetwear storefront inspired by Veirdo's **layout rhythm + voice**, not 
 | `src/lib/reels.ts` | Active Instagram reels for Watch & Buy |
 | `src/lib/admin-auth.ts` | Admin session helpers |
 | `src/lib/cloudinary.ts` | Upload helper |
-| `src/models/` | Product, Category, Promo, Reel |
+| `src/lib/phonepe.ts` | PhonePe Checkout v2 OAuth + pay/status |
+| `src/lib/shiprocket.ts` | Shiprocket auth + adhoc create |
+| `src/lib/order-lifecycle.ts` | markPaid / COD confirm / cancel / fulfillment |
+| `src/lib/site-settings.ts` | Fees, COD toggle, free-shipping threshold |
+| `src/models/` | Product, Category, Promo, Reel, Order, SiteSettings, User |
+
+## Checkout
+- Prepaid: PhonePe redirect → webhook `/api/webhooks/phonepe` + success poll
+- COD: optional OTP if Twilio configured; Shiprocket `payment_method=COD`
+- Fulfillment webhook: `/api/webhooks/fulfillment` (token auth)
+- Stock: `priceCart` checks `stockBySize` when set; **does not decrement**
+- Admin: `/admin/settings` (fees), `/admin/orders` (retry Shiprocket)
 
 ## Env (see `.env.example`)
 - `MONGODB_URI` + `USE_MEMORY_CATALOG=false` for admin/catalog writes
 - `ADMIN_PASSWORD` + `ADMIN_SECRET`
 - `CLOUDINARY_CLOUD_NAME` / `API_KEY` / `API_SECRET`
+- PhonePe / Shiprocket / Resend / Twilio — see `.env.example` webhook URLs
 
 ## Commands
 ```bash

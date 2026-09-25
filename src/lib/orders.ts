@@ -52,6 +52,27 @@ export async function priceCart(
     }
     const product = bySlug.get(item.slug);
     if (!product) return { ok: false, error: `Product unavailable: ${item.slug}` };
+    if (!product.sizes?.includes(item.size)) {
+      return { ok: false, error: `Size ${item.size} unavailable for ${product.title}` };
+    }
+    // Stock: check only — do not decrement (manual inventory / Shiprocket).
+    const stockMap = product.stockBySize as
+      | Map<string, number>
+      | Record<string, number>
+      | undefined;
+    const stock =
+      stockMap instanceof Map
+        ? stockMap.get(item.size)
+        : stockMap?.[item.size];
+    if (typeof stock === "number" && stock < qty) {
+      return {
+        ok: false,
+        error:
+          stock <= 0
+            ? `${product.title} (${item.size}) is out of stock`
+            : `Only ${stock} left for ${product.title} (${item.size})`,
+      };
+    }
     priced.push({
       productId: String(product._id),
       slug: product.slug,
@@ -110,6 +131,7 @@ export async function listOrders(limit = 50) {
   const rows = await Order.find().sort({ createdAt: -1 }).limit(limit).lean();
   return rows.map((r) => ({
     _id: String(r._id),
+    orderNumber: r.orderNumber || r.merchantOrderId,
     merchantOrderId: r.merchantOrderId,
     name: r.name,
     phone: r.phone,
@@ -117,9 +139,15 @@ export async function listOrders(limit = 50) {
     city: r.city,
     pincode: r.pincode,
     total: r.total,
-    shipping: r.shipping,
+    shipping: r.shippingFee ?? r.shipping,
+    shippingFee: r.shippingFee ?? r.shipping,
+    codFee: r.codFee || 0,
+    paymentMethod: r.paymentMethod || "prepaid",
+    paymentStatus: r.paymentStatus || "pending",
     status: r.status,
     courier: r.courier || "",
+    awb: r.awb || "",
+    trackingUrl: r.trackingUrl || "",
     shiprocketOrderId: r.shiprocketOrderId || "",
     createdAt: r.createdAt ? new Date(r.createdAt).toISOString() : "",
     items: r.items,

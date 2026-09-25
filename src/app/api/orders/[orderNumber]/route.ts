@@ -1,24 +1,12 @@
 import { NextResponse } from "next/server";
-import { useMemoryCatalog } from "@/lib/db";
-import {
-  findOrderByNumber,
-  markOrderPaid,
-} from "@/lib/order-lifecycle";
+import { findOrderByNumber, markOrderPaid } from "@/lib/order-lifecycle";
 import { getPhonePeStatus, isPhonePeConfigured } from "@/lib/phonepe";
 
-export async function GET(req: Request) {
-  const id =
-    new URL(req.url).searchParams.get("order") ||
-    new URL(req.url).searchParams.get("order_id") ||
-    "";
-  if (!id) {
-    return NextResponse.json({ error: "Missing order" }, { status: 400 });
-  }
-  if (useMemoryCatalog()) {
-    return NextResponse.json({ error: "Orders need MongoDB" }, { status: 503 });
-  }
+type Ctx = { params: Promise<{ orderNumber: string }> };
 
-  const order = await findOrderByNumber(id);
+export async function GET(_req: Request, ctx: Ctx) {
+  const { orderNumber } = await ctx.params;
+  const order = await findOrderByNumber(orderNumber);
   if (!order) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
@@ -35,7 +23,6 @@ export async function GET(req: Request) {
       await markOrderPaid(order.orderNumber || order.merchantOrderId);
     } else if (state === "FAILED") {
       order.paymentStatus = "failed";
-      order.status = "cancelled";
       order.timeline.push({
         status: "payment_failed",
         at: new Date(),
@@ -45,23 +32,24 @@ export async function GET(req: Request) {
     }
   }
 
-  const fresh = await findOrderByNumber(id);
+  const fresh = await findOrderByNumber(orderNumber);
   if (!fresh) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
   return NextResponse.json({
     orderNumber: fresh.orderNumber || fresh.merchantOrderId,
-    merchantOrderId: fresh.merchantOrderId,
     status: fresh.status,
     paymentMethod: fresh.paymentMethod || "prepaid",
     paymentStatus: fresh.paymentStatus || "pending",
     total: fresh.total,
     shippingFee: fresh.shippingFee ?? fresh.shipping ?? 0,
     codFee: fresh.codFee || 0,
-    courier: fresh.courier || "",
+    items: fresh.items,
     awb: fresh.awb || "",
     trackingUrl: fresh.trackingUrl || "",
-    shiprocketOrderId: fresh.shiprocketOrderId || "",
+    courier: fresh.courier || "",
+    name: fresh.name,
+    createdAt: fresh.createdAt,
   });
 }

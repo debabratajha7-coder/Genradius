@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { DeleteAccountPanel } from "@/components/auth/DeleteAccountPanel";
 import { useCart } from "@/components/cart/CartProvider";
@@ -27,7 +27,7 @@ const LINKS = [
     id: "addresses",
     label: "Addresses",
     hint: "Delivery spots",
-    href: "#addresses",
+    href: "/account/addresses",
   },
   {
     id: "wishlist",
@@ -49,15 +49,6 @@ const LINKS = [
   },
 ] as const;
 
-type SavedAddress = {
-  id: string;
-  label: string;
-  line1: string;
-  city: string;
-  pincode: string;
-};
-
-const ADDRESS_KEY = "genradius-addresses-v1";
 const WISHLIST_KEY = "genradius-wishlist-v1";
 
 function loadJson<T>(key: string, fallback: T): T {
@@ -75,15 +66,7 @@ export default function AccountPage() {
   const { user, loading, logout } = useAuth();
   const { items, count, subtotal, openCart } = useCart();
   const router = useRouter();
-  const [addresses, setAddresses] = useState<SavedAddress[]>([]);
   const [wishlistCount, setWishlistCount] = useState(0);
-  const [showAddressForm, setShowAddressForm] = useState(false);
-  const [form, setForm] = useState({
-    label: "Home",
-    line1: "",
-    city: "",
-    pincode: "",
-  });
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
@@ -93,34 +76,9 @@ export default function AccountPage() {
   }, [loading, user, router]);
 
   useEffect(() => {
-    setAddresses(loadJson<SavedAddress[]>(ADDRESS_KEY, []));
     const wishlist = loadJson<unknown[]>(WISHLIST_KEY, []);
     setWishlistCount(Array.isArray(wishlist) ? wishlist.length : 0);
   }, []);
-
-  function saveAddresses(next: SavedAddress[]) {
-    setAddresses(next);
-    localStorage.setItem(ADDRESS_KEY, JSON.stringify(next));
-  }
-
-  function addAddress(e: FormEvent) {
-    e.preventDefault();
-    if (!form.line1.trim() || !form.city.trim() || !form.pincode.trim()) return;
-    const next: SavedAddress = {
-      id: `addr-${Date.now()}`,
-      label: form.label.trim() || "Home",
-      line1: form.line1.trim(),
-      city: form.city.trim(),
-      pincode: form.pincode.trim(),
-    };
-    saveAddresses([...addresses, next]);
-    setForm({ label: "Home", line1: "", city: "", pincode: "" });
-    setShowAddressForm(false);
-  }
-
-  function removeAddress(id: string) {
-    saveAddresses(addresses.filter((a) => a.id !== id));
-  }
 
   if (loading || !user || user.profileComplete === false) {
     return (
@@ -196,9 +154,6 @@ export default function AccountPage() {
                     {item.id === "wishlist" && wishlistCount > 0
                       ? ` (${wishlistCount})`
                       : ""}
-                    {item.id === "addresses" && addresses.length > 0
-                      ? ` (${addresses.length})`
-                      : ""}
                   </span>
                   <span className="text-[11px] text-[var(--moss)]">
                     {item.hint}
@@ -260,7 +215,7 @@ export default function AccountPage() {
         )}
       </section>
 
-      {/* Addresses */}
+      {/* Addresses — managed at /account/addresses (server-backed) */}
       <section
         id="addresses"
         className="mt-6 scroll-mt-24 rounded-md border-2 border-[var(--ink)] bg-white p-5 shadow-[4px_4px_0_0_var(--ink)] sm:p-6"
@@ -269,87 +224,23 @@ export default function AccountPage() {
           <h2 className="font-[family-name:var(--font-display)] text-lg font-extrabold tracking-wide uppercase">
             Addresses
           </h2>
-          <button
-            type="button"
+          <Link
+            href="/account/addresses"
             className="text-[11px] font-extrabold tracking-wider uppercase underline"
-            onClick={() => setShowAddressForm((v) => !v)}
           >
-            {showAddressForm ? "Cancel" : "Add address"}
-          </button>
+            Manage
+          </Link>
         </div>
-
-        {showAddressForm && (
-          <form onSubmit={addAddress} className="mt-4 space-y-3">
-            <input
-              className="w-full rounded-md border-2 border-[var(--ink)] px-3 py-2.5 text-sm shadow-[2px_2px_0_0_var(--ink)] outline-none"
-              placeholder="Label (Home / Work)"
-              value={form.label}
-              onChange={(e) => setForm((f) => ({ ...f, label: e.target.value }))}
-            />
-            <input
-              required
-              className="w-full rounded-md border-2 border-[var(--ink)] px-3 py-2.5 text-sm shadow-[2px_2px_0_0_var(--ink)] outline-none"
-              placeholder="Address line"
-              value={form.line1}
-              onChange={(e) => setForm((f) => ({ ...f, line1: e.target.value }))}
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                required
-                className="rounded-md border-2 border-[var(--ink)] px-3 py-2.5 text-sm shadow-[2px_2px_0_0_var(--ink)] outline-none"
-                placeholder="City"
-                value={form.city}
-                onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-              />
-              <input
-                required
-                inputMode="numeric"
-                className="rounded-md border-2 border-[var(--ink)] px-3 py-2.5 text-sm shadow-[2px_2px_0_0_var(--ink)] outline-none"
-                placeholder="PIN"
-                value={form.pincode}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, pincode: e.target.value }))
-                }
-              />
-            </div>
-            <button type="submit" className="btn-accent w-full py-2.5 text-xs sm:w-auto sm:px-6">
-              Save address
-            </button>
-          </form>
-        )}
-
-        {addresses.length === 0 && !showAddressForm ? (
-          <p className="mt-4 text-sm text-[var(--moss)]">
-            No saved addresses. Add one for faster checkout.
-          </p>
-        ) : (
-          <ul className="mt-4 space-y-3">
-            {addresses.map((a) => (
-              <li
-                key={a.id}
-                className="flex items-start justify-between gap-3 rounded-md border border-[var(--border)] bg-[var(--background)] px-4 py-3"
-              >
-                <div>
-                  <p className="text-xs font-extrabold tracking-wider uppercase">
-                    {a.label}
-                  </p>
-                  <p className="mt-1 text-sm">
-                    {a.line1}
-                    <br />
-                    {a.city} — {a.pincode}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="text-[10px] font-bold tracking-wider text-[var(--moss)] uppercase underline"
-                  onClick={() => removeAddress(a.id)}
-                >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+        <p className="mt-3 text-sm text-[var(--moss)]">
+          Save delivery spots for faster checkout. Default address prefills the
+          bag when you check out.
+        </p>
+        <Link
+          href="/account/addresses"
+          className="btn-accent mt-4 inline-flex px-5 py-2.5 text-xs"
+        >
+          Open addresses
+        </Link>
       </section>
 
       {/* Wishlist */}

@@ -1,11 +1,24 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import { parseAddress, priceCart, weightKg, type CheckoutItemInput } from "@/lib/orders";
+import { connectDB, useMemoryCatalog } from "@/lib/db";
+import {
+  computeCheckoutTotals,
+  getCheckoutSettings,
+} from "@/lib/site-settings";
+import { parseAddress, priceCart, type CheckoutItemInput } from "@/lib/orders";
 import { createPhonePePayment, isPhonePeConfigured } from "@/lib/phonepe";
+import { confirmCodOrder } from "@/lib/order-lifecycle";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { getSiteUrl } from "@/lib/site";
-import { isShiprocketConfigured, quoteShipping } from "@/lib/shiprocket";
+import { checkPhoneOtp } from "@/lib/twilio";
+import { getUserSession } from "@/lib/user-auth";
 import Order from "@/models/Order";
+
+function orderNumber() {
+  return `GR${Date.now().toString(36).toUpperCase()}${Math.random()
+    .toString(36)
+    .slice(2, 5)
+    .toUpperCase()}`;
+}
 
 export async function POST(req: Request) {
   const limited = rateLimit({
@@ -20,12 +33,9 @@ export async function POST(req: Request) {
     );
   }
 
-  if (!isPhonePeConfigured()) {
+  if (useMemoryCatalog()) {
     return NextResponse.json(
-      {
-        error:
-          "PhonePe isn’t configured yet. Add PHONEPE_CLIENT_ID and PHONEPE_CLIENT_SECRET.",
-      },
+      { error: "Checkout needs MongoDB (USE_MEMORY_CATALOG=false)." },
       { status: 503 },
     );
   }
@@ -36,77 +46,146 @@ export async function POST(req: Request) {
       phone?: string;
       email?: string;
       address?: string;
+      line2?: string;
       city?: string;
       state?: string;
       pincode?: string;
       items?: CheckoutItemInput[];
+      paymentMethod?: "prepaid" | "cod";
+      codOtp?: string;
     };
+
+    const paymentMethod =
+      body.paymentMethod === "cod" ? "cod" : "prepaid";
+    const settings = await getCheckoutSettings();
+
+    if (paymentMethod === "cod" && !settings.codEnabled) {
+      return NextResponse.json(
+        { error: "Cash on delivery is not available right now." },
+        { status: 400 },
+      );
+    }
+    if (paymentMethod === "prepaid" && !isPhonePeConfigured()) {
+      return NextResponse.json(
+        {
+          error:
+            "Online payment isn’t configured yet. Add PhonePe credentials or choose COD.",
+        },
+        { status: 503 },
+      );
+    }
 
     const address = parseAddress(body);
     if (!address.ok) {
       return NextResponse.json({ error: address.error }, { status: 400 });
     }
+
+    if (paymentMethod === "cod" && settings.codOtpRequired) {
+      const otp = String(body.codOtp || "").trim();
+      if (!otp) {
+        return NextResponse.json(
+          { error: "Enter the OTP sent to your phone for COD." },
+          { status: 400 },
+        );
+      }
+      const ok = await checkPhoneOtp(address.phone, otp);
+      if (!ok) {
+        return NextResponse.json(
+          { error: "Invalid or expired COD OTP." },
+          { status: 400 },
+        );
+      }
+    }
+
     const priced = await priceCart(body.items || []);
     if (!priced.ok) {
       return NextResponse.json({ error: priced.error }, { status: 400 });
     }
 
-    // Free shipping for customers — Shiprocket booking can still run post-payment
-    let shipping = 0;
-    let courier = "Standard";
-    if (isShiprocketConfigured()) {
-      try {
-        const quote = await quoteShipping({
-          deliveryPincode: address.pincode,
-          weightKg: weightKg(priced.items),
-        });
-        courier = quote.courier || courier;
-      } catch {
-        /* keep Standard — charge stays 0 */
-      }
-    }
-
-    const total = priced.subtotal + shipping;
-    const merchantOrderId = `GR${Date.now().toString(36).toUpperCase()}`;
-
-    await connectDB();
-    await Order.create({
-      merchantOrderId,
-      items: priced.items,
-      subtotal: priced.subtotal,
-      shipping,
-      total,
-      name: address.name,
+    const fees = computeCheckoutTotals(
+      priced.subtotal,
+      paymentMethod,
+      settings,
+    );
+    const id = orderNumber();
+    const session = await getUserSession();
+    const line2 = String(body.line2 || "").trim();
+    const snapshot = {
+      fullName: address.name,
       phone: address.phone,
       email: address.email,
-      address: address.address,
+      line1: address.address,
+      line2,
       city: address.city,
       state: address.state,
       pincode: address.pincode,
-      status: "pending",
-      courier,
+      country: "India",
+    };
+
+    await connectDB();
+    await Order.create({
+      orderNumber: id,
+      merchantOrderId: id,
+      userId: session?.userId || "",
+      items: priced.items.map((i) => ({ ...i, weightKg: 0.4 })),
+      subtotal: priced.subtotal,
+      shippingFee: fees.shippingFee,
+      shipping: fees.shippingFee,
+      codFee: fees.codFee,
+      total: fees.total,
+      paymentMethod,
+      paymentStatus: "pending",
+      status: "pending_payment",
+      shippingAddress: snapshot,
+      billingAddress: snapshot,
+      name: address.name,
+      phone: address.phone,
+      email: address.email,
+      address: [address.address, line2].filter(Boolean).join(", "),
+      city: address.city,
+      state: address.state,
+      pincode: address.pincode,
+      timeline: [{ status: "created", at: new Date(), note: paymentMethod }],
     });
 
+    if (paymentMethod === "cod") {
+      await confirmCodOrder(id);
+      return NextResponse.json({
+        ok: true,
+        orderNumber: id,
+        merchantOrderId: id,
+        paymentMethod: "cod",
+        redirectUrl: `${getSiteUrl()}/checkout/success?order_id=${id}`,
+        total: fees.total,
+        shippingFee: fees.shippingFee,
+        codFee: fees.codFee,
+      });
+    }
+
     const pay = await createPhonePePayment({
-      merchantOrderId,
-      amountPaise: Math.round(total * 100),
-      redirectUrl: `${getSiteUrl()}/checkout/return?order=${merchantOrderId}`,
+      merchantOrderId: id,
+      amountPaise: Math.round(fees.total * 100),
+      redirectUrl: `${getSiteUrl()}/checkout/success?order_id=${id}`,
     });
 
     await Order.findOneAndUpdate(
-      { merchantOrderId },
+      { orderNumber: id },
       { $set: { phonepeOrderId: pay.phonepeOrderId } },
     );
 
     return NextResponse.json({
       ok: true,
-      merchantOrderId,
+      orderNumber: id,
+      merchantOrderId: id,
+      paymentMethod: "prepaid",
       redirectUrl: pay.redirectUrl,
-      total,
-      shipping,
+      total: fees.total,
+      shippingFee: fees.shippingFee,
+      codFee: fees.codFee,
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Checkout failed";
+    console.error("[checkout]", message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

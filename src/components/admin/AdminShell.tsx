@@ -45,7 +45,10 @@ const GROUPS: {
   },
   {
     title: "More",
-    links: [{ href: "/admin/orders", label: "Orders" }],
+    links: [
+      { href: "/admin/orders", label: "Orders" },
+      { href: "/admin/settings", label: "Checkout settings" },
+    ],
   },
 ];
 
